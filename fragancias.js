@@ -1,31 +1,10 @@
 /* =====================================================================
    SOY DE AROMA · BASE DE DATOS DE FRAGANCIAS
-   ---------------------------------------------------------------------
-   Edita ESTE archivo para AGREGAR, QUITAR o ACTUALIZAR fragancias.
-   Después vuelve a subir "fragancias.js" a tu hosting (Netlify / Cloudflare).
-
-   CAMPOS:
-     n      -> Nombre                          (texto)
-     b      -> Marca                           (texto)
-     cat    -> "best" (Más vendidos) o "clasico" (Clásicos)
-     g      -> "Masculino" o "Unisex"
-     seas   -> "Invierno" o "Primavera"
-     occ    -> "Noche" o "Día"
-     dur    -> Duración: "6 hrs", "8–10 hrs", "+12 hrs"
-               (color del badge automático: 4–6h amarillo · 6.5–10h rojo · +10h morado)
-     notes  -> Notas / pirámide olfativa        (texto)
-     img    -> Ruta de la FOTO. Ej: "imagenes/dior-sauvage-edp.jpg"
-               Deja "" (vacío) para usar el frasco dibujado.
-               Pon el archivo de imagen dentro de la carpeta "imagenes".
-     p5     -> Precio 5 ml   (número, sin "$").  0 = "Precio por confirmar"
-     p10    -> Precio 10 ml  (número, sin "$").
-     stock  -> true = En existencia · false = Agotado
-     c1,c2  -> Colores del frasco dibujado (si no hay foto)
-     cap    -> Color de la tapa     lbl -> Color del texto
-     r      -> Estrellas (1 a 5)
-
-   👉 AGREGAR: copia una línea, pégala antes del "];" y cambia los datos.
-   👉 QUITAR:  borra su línea.   👉 AGOTAR: stock:true -> stock:false
+   Generado desde el panel de administrador. Sube este archivo a tu
+   hosting (reemplazando el anterior) para publicar los cambios.
+     img         = ruta de la foto, ej "imagenes/archivo.jpg" ("" usa frasco)
+     stock:true  = En existencia  ·  stock:false = Agotado
+     p5 / p10    = precios (número, sin "$"). 0 = "Precio por confirmar".
    ===================================================================== */
 
 const P = [
@@ -57,7 +36,7 @@ const P = [
   {n:"The Scent Elixir", b:"Hugo Boss", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Noche", dur:"+12 hrs", notes:"Chile Rojo, Lavanda y Sándalo", img:"imagenes/boss-the-scent-elixir.jpg", p5:270, p10:540, stock:true, c1:"#7a1812", c2:"#3a0a06", cap:"#caa05a", lbl:"#f0a89a", r:4.7},
   {n:"Sauvage EDP", b:"Dior", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Día", dur:"+8 hrs", notes:"Bergamota, Lavanda, Anís, Ambroxan y Vainilla", img:"imagenes/dior-sauvage-edp.jpg", p5:230, p10:460, stock:true, c1:"#16233f", c2:"#080d18", cap:"#0b1422", lbl:"#9fc0ee", r:4.9},
   {n:"Explorer Platinum", b:"Montblanc", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6–7 hrs", notes:"Hojas de Violeta, Esclarea y Cedro", img:"imagenes/montblanc-explorer-platinum.jpg", p5:180, p10:360, stock:true, c1:"#9aa0a6", c2:"#54595e", cap:"#cfd2d6", lbl:"#1a1c1e", r:4.5},
-  {n:"CH Men Sport EDT", b:"Carolina Herrera", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6–7 hrs", notes:"Toronja, Bergamota, Notas Marinas, Vetiver y Sándalo", img:"", p5:140, p10:280, stock:true, c1:"#b53a2e", c2:"#6a1810", cap:"#cfcfcf", lbl:"#f4e8e6", r:4.5},
+  {n:"CH Men Sport EDT", b:"Carolina Herrera", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6–7 hrs", notes:"Toronja, Bergamota, Notas Marinas, Vetiver y Sándalo", img:"", p5:140, p10:280, stock:false, c1:"#b53a2e", c2:"#6a1810", cap:"#cfcfcf", lbl:"#f4e8e6", r:4.5},
   {n:"CH Men EDT", b:"Carolina Herrera", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Día", dur:"6–7 hrs", notes:"Bergamota, Azafrán, Cuero, Ámbar y Sándalo", img:"imagenes/ch-men-edt.jpg", p5:140, p10:280, stock:true, c1:"#1a1614", c2:"#0a0706", cap:"#caa05a", lbl:"#d4c4ac", r:4.6},
   {n:"212 VIP Black Smiley", b:"Carolina Herrera", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Día", dur:"7–8 hrs", notes:"Naranja, Jengibre, Pimienta, Lavanda y Vainilla", img:"imagenes/ch-212-vip-black-smiley.jpg", p5:230, p10:430, stock:true, c1:"#141414", c2:"#060606", cap:"#1c1c1c", lbl:"#f4d23a", r:4.6},
   {n:"Nuit d'Issey", b:"Issey Miyake", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Noche", dur:"6–7 hrs", notes:"Toronja, Bergamota, Cuero, Ébano y Haba Tonka", img:"imagenes/issey-nuit-dissey.jpg", p5:140, p10:280, stock:true, c1:"#14182a", c2:"#070912", cap:"#0a0c14", lbl:"#aeb6cc", r:4.6},
@@ -65,8 +44,8 @@ const P = [
   {n:"One Million Parfum", b:"Paco Rabanne", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Día", dur:"+12 hrs", notes:"Nardo, Cuero, Ámbar y Azafrán", img:"imagenes/paco-one-million-parfum.jpg", p5:150, p10:300, stock:true, c1:"#c79a2e", c2:"#7a5a14", cap:"#e7c777", lbl:"#3a2a08", r:4.7},
   {n:"Aoud Exclusif", b:"Mancera", cat:"clasico", g:"Masculino", seas:"Invierno", occ:"Noche", dur:"+12 hrs", notes:"Azafrán, Comino, Pimienta, Pachulí y Madera de Oud", img:"imagenes/mancera-aoud-exclusif.jpg", p5:270, p10:540, stock:true, c1:"#7a3a10", c2:"#3a1c06", cap:"#caa05a", lbl:"#f0c89a", r:4.7},
   {n:"Club de Nuit Milestone", b:"Armaf", cat:"clasico", g:"Unisex", seas:"Primavera", occ:"Noche", dur:"+8 hrs", notes:"Frutos Rojos, Bergamota, Sándalo, Almizcle y Ambroxan", img:"imagenes/armaf-club-de-nuit-milestone.jpg", p5:100, p10:195, stock:true, c1:"#e0b89a", c2:"#a07a5a", cap:"#caa05a", lbl:"#4a3420", r:4.6},
-  {n:"Legend", b:"Montblanc", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6 hrs", notes:"Violeta, Bergamota, Notas Amaderadas, Musgo y Roble", img:"imagenes/montblanc-legend.jpg", p5:0, p10:0, stock:false, c1:"#1c2a2e", c2:"#0a1416", cap:"#9aa0a6", lbl:"#cfe0e2", r:4.6},
-  {n:"Stallion 53", b:"Emper", cat:"clasico", g:"Unisex", seas:"Invierno", occ:"Noche", dur:"6 hrs", notes:"Cardamomo, Violeta, Ámbar, Iris, Sándalo, Cuero y Cedro", img:"imagenes/emper-stallion-53.jpg", p5:0, p10:0, stock:false, c1:"#3a2418", c2:"#160c06", cap:"#caa05a", lbl:"#e0caa6", r:4.6},
-  {n:"Roadster Sport", b:"Cartier", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6 hrs", notes:"Bergamota, Mandarina, Romero, Salvia, Pachulí y Pimienta", img:"imagenes/cartier-roadster-sport.jpg", p5:0, p10:0, stock:false, c1:"#14233a", c2:"#070d18", cap:"#cfcfcf", lbl:"#bcd0ee", r:4.5},
-  {n:"Declaration Essence", b:"Cartier", cat:"clasico", g:"Unisex", seas:"Primavera", occ:"Día", dur:"6 hrs", notes:"Cítricos, Cardamomo y Cedro", img:"imagenes/cartier-declaration-essence.jpg", p5:0, p10:0, stock:false, c1:"#2a2620", c2:"#10110d", cap:"#caa05a", lbl:"#d4c4ac", r:4.5}
+  {n:"Legend", b:"Montblanc", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6 hrs", notes:"Violeta, Bergamota, Notas Amaderadas, Musgo y Roble", img:"imagenes/montblanc-legend.jpg", p5:175, p10:235, stock:true, c1:"#1c2a2e", c2:"#0a1416", cap:"#9aa0a6", lbl:"#cfe0e2", r:4.6},
+  {n:"Stallion 53", b:"Emper", cat:"clasico", g:"Unisex", seas:"Invierno", occ:"Noche", dur:"6 hrs", notes:"Cardamomo, Violeta, Ámbar, Iris, Sándalo, Cuero y Cedro", img:"imagenes/emper-stallion-53.jpg", p5:100, p10:195, stock:true, c1:"#3a2418", c2:"#160c06", cap:"#caa05a", lbl:"#e0caa6", r:4.6},
+  {n:"Roadster Sport", b:"Cartier", cat:"clasico", g:"Masculino", seas:"Primavera", occ:"Día", dur:"6 hrs", notes:"Bergamota, Mandarina, Romero, Salvia, Pachulí y Pimienta", img:"imagenes/cartier-roadster-sport.jpg", p5:180, p10:275, stock:true, c1:"#14233a", c2:"#070d18", cap:"#cfcfcf", lbl:"#bcd0ee", r:4.5},
+  {n:"Declaration Essence", b:"Cartier", cat:"clasico", g:"Unisex", seas:"Primavera", occ:"Día", dur:"6 hrs", notes:"Cítricos, Cardamomo y Cedro", img:"imagenes/cartier-declaration-essence.jpg", p5:200, p10:300, stock:true, c1:"#2a2620", c2:"#10110d", cap:"#caa05a", lbl:"#d4c4ac", r:4.5}
 ];
