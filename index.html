@@ -478,6 +478,113 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
 .card .imgwrap img.photo{width:100%;height:100%;object-fit:contain;padding:16px;display:block}
 .card.soldout .bottle,.card.soldout img.photo{filter:grayscale(.8);opacity:.45}
 .modal-img img.photo{max-width:100%;max-height:300px;object-fit:contain;border-radius:10px;display:block}
+
+/* ---------- OPTIMIZACIÓN MÓVIL (solo teléfonos) ---------- */
+@media(max-width:600px){
+  .shell{padding:0 12px;margin-top:18px;gap:18px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:11px}
+  /* área de imagen cuadrada que escala con el ancho de la tarjeta */
+  .card .imgwrap{height:auto;min-height:160px;aspect-ratio:1/1}
+  .card .imgwrap img.photo{padding:9px}
+  .card .bottle{width:74px;height:128px}
+  .card .info{padding:11px 11px 13px}
+  .card .brandline{font-size:9.5px;letter-spacing:.12em;margin-bottom:4px}
+  .card .pname{font-size:15.5px;margin-bottom:6px}
+  .rating{margin-bottom:7px}
+  .rating .rn{font-size:11px}
+  .card .notes{font-size:11.5px;min-height:0;margin-bottom:9px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .meta{gap:5px;margin-bottom:10px}
+  .meta span,.durbadge{font-size:9.5px;padding:2px 6px}
+  .meta span svg,.durbadge svg{width:10px;height:10px}
+  .cardfoot{gap:9px}
+  .sizebtn{padding:6px 5px}
+  .sizebtn .sz{font-size:10px}
+  .sizebtn .pr{font-size:13px}
+  .addbtn{padding:10px;font-size:12.5px}
+  .tag{font-size:9px;padding:3px 6px}
+  .card .fav{width:28px;height:28px;top:8px;right:8px}
+  .card .fav svg{width:15px;height:15px}
+  .card .tags{top:8px;left:8px;gap:4px}
+  .rhead{margin-bottom:14px}
+  .rhead .rtitle{font-size:23px}
+  /* detalle del producto más cómodo en móvil */
+  .modal-img{padding:22px;min-height:0}
+  .modal-img img.photo{max-height:240px}
+  .modal-body{padding:22px 20px}
+}
+@media(max-width:360px){
+  .card .pname{font-size:14.5px}
+  .sizebtn .pr{font-size:12px}
+}
+
+/* ---------- MÓVIL · ENCABEZADO Y SECCIONES ---------- */
+@media(max-width:600px){
+  /* evita cualquier desbordamiento horizontal */
+  html,body{max-width:100%;overflow-x:hidden}
+  .topbar-inner,.subnav-inner,.hero,.shell,.infostrip,.foot-inner,.foot-bottom{max-width:100%}
+
+  /* ENCABEZADO: marca + carrito en una fila; buscador de ancho completo debajo */
+  .topbar-inner{flex-wrap:wrap;gap:10px;padding:10px 14px}
+  .brand{order:1;gap:10px;min-width:0}
+  .brand .logo{width:42px;height:42px}
+  .brand .name strong{font-size:21px}
+  .brand .name small{font-size:9px;letter-spacing:.26em}
+  .toplinks{order:2;margin-left:auto}
+  .icon-btn{padding:8px 10px}
+  .icon-btn .lbl b{font-size:12px}
+  .searchbar{order:3;flex:1 0 100%;max-width:none}
+  .searchbar select{padding:0 10px;font-size:12px;height:42px}
+  .searchbar input{font-size:14px;padding:0 12px;height:42px}
+  .searchbar .go{width:46px;height:42px}
+  .subnav-inner{padding:0 14px}
+  .subnav button{padding:10px 12px;font-size:12.5px}
+
+  /* HERO */
+  .hero{padding:0 14px;margin-top:16px}
+  .hero-card{padding:26px 20px;min-height:0;border-radius:16px}
+  .hero-card::after{display:none}
+  .hero-grid{gap:18px}
+  .hero-card .eyebrow{font-size:11px;letter-spacing:.3em}
+  .hero-card p{font-size:14px}
+  .hero-badges{gap:8px;margin-top:18px}
+  .hero-badges span{font-size:11.5px;padding:6px 10px}
+  .tiktok-frame{max-height:460px}
+
+  /* CUERPO / FILTROS / RESULTADOS */
+  .shell{padding:0 14px;margin:18px auto 44px;gap:16px}
+  .filters{position:static}
+  .filters .fbox{padding:14px 14px 6px;margin-bottom:14px}
+  .filters h3{font-size:19px;margin-bottom:10px}
+  .rhead{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:14px}
+  .rhead .sort{width:100%}
+  .rhead select{flex:1}
+
+  /* PROCESO DE COMPRA */
+  .infostrip{padding:0 14px;margin-bottom:36px}
+  .infostrip .grid3{gap:12px}
+  .istep{padding:18px}
+  .istep h4{font-size:20px}
+
+  /* PIE DE PÁGINA */
+  footer{padding:36px 16px 28px}
+  .foot-inner{gap:24px}
+  .foot-logo{width:96px;height:96px}
+
+  /* BOTÓN FLOTANTE WHATSAPP */
+  .fab{width:52px;height:52px;bottom:18px;right:18px}
+  .fab svg{width:26px;height:26px}
+
+  /* VENTANAS (carrito / pago / quiz / detalle) */
+  .drawer{width:100%}
+  .drawer .dh{padding:16px 18px}
+  .ditems{padding:12px 16px}
+  .dfoot{padding:16px 18px 20px}
+  .cko-card,.quiz-card{padding:24px 18px 26px}
+  .quiz h2{font-size:25px}
+  .qopt{padding:12px 13px;gap:11px}
+  .qopt .qtxt{font-size:13.5px}
+}
 </style>
 </head>
 <body>
@@ -741,10 +848,10 @@ const $ = id => document.getElementById(id);
 /* ====== CONFIG — EDITA ESTOS DATOS CON TU CUENTA REAL ====== */
 const WA = "528180120847"; // WhatsApp con código de país, sin "+"
 const BANK = {
-  banco:   "BANAMEX",
-  clabe:   "002580702130699754",
-  cuenta: "3069975",
-  titular: "HUGO LOZANO"
+  banco:   "[Tu banco]",
+  clabe:   "[Tu CLABE de 18 dígitos]",
+  tarjeta: "[Tu número de tarjeta]",
+  titular: "[Titular de la cuenta]"
 };
 
 /* ====== DURACIÓN: color por horas ====== */
