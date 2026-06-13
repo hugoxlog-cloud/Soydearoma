@@ -463,6 +463,21 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
 .cko .ckobtn:hover{filter:brightness(1.1)}
 .ckonote{font-size:11.5px;color:var(--text-faint);margin-top:12px;line-height:1.5;text-align:center}
 .field-err{border-color:var(--red)!important}
+
+/* ---------- STOCK / DISPONIBILIDAD ---------- */
+.tag.out{background:rgba(181,58,46,.95);color:#fff;border:none}
+.tag.pend{background:rgba(201,162,75,.92);color:#1a1408;border:none}
+.card.soldout .pname{color:var(--text-dim)}
+.cardfoot{margin-top:auto;display:flex;flex-direction:column;gap:11px}
+.cardfoot .sizepick{margin:0}
+.addbtn.disabled{background:var(--panel-2);color:var(--text-faint);border:1px solid var(--line);cursor:not-allowed}
+.addbtn.disabled:hover{transform:none;filter:none}
+.addbtn.consult{background:#1f7a4d;color:#fff;text-decoration:none}
+
+/* ---------- FOTOS DE PRODUCTO ---------- */
+.card .imgwrap img.photo{width:100%;height:100%;object-fit:contain;padding:16px;display:block}
+.card.soldout .bottle,.card.soldout img.photo{filter:grayscale(.8);opacity:.45}
+.modal-img img.photo{max-width:100%;max-height:300px;object-fit:contain;border-radius:10px;display:block}
 </style>
 </head>
 <body>
@@ -711,48 +726,9 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15.5a6 6 0 01-6 6 12 12 0 01-12-12 6 6 0 016-6c.5 0 1 .3 1.2.8l1.3 3a1.3 1.3 0 01-.3 1.4l-1.2 1.2a9 9 0 004.1 4.1l1.2-1.2a1.3 1.3 0 011.4-.3l3 1.3c.5.2.8.7.8 1.2z"/></svg>
 </a>
 
+<script src="fragancias.js"></script>
 <script>
-/* ============ DATA ============ */
-const P = [
- // BEST SELLERS
- {n:"Oud For Greatness",b:"Initio",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Azafrán, Madera de Oud y Pachulí",p5:625,p10:1251,c1:"#1c1812",c2:"#0a0806",cap:"#c9a24b",lbl:"#e7c777",r:4.9},
- {n:"Sauvage Elixir",b:"Dior",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Nuez Moscada, Lavanda, Ámbar y Pachulí",p5:567,p10:1134,c1:"#16233f",c2:"#080d18",cap:"#0b1422",lbl:"#9fc0ee",r:5.0},
- {n:"Dior Homme Intense",b:"Dior",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8–10 hrs",notes:"Iris, Almizcle y Cedro",p5:255,p10:520,c1:"#3a2008",c2:"#160a02",cap:"#0a0807",lbl:"#e2a85f",r:4.8},
- {n:"Scandal Le Parfum",b:"Jean Paul Gaultier",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Geranio, Haba Tonka y Sándalo",p5:245,p10:490,c1:"#14171c",c2:"#070809",cap:"#c9a24b",lbl:"#dcdce0",r:4.7},
- {n:"Le Male Elixir",b:"Jean Paul Gaultier",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8–10 hrs",notes:"Lavanda, Vainilla, Miel y Haba Tonka",p5:305,p10:610,c1:"#7a4a1c",c2:"#3a2208",cap:"#caa05a",lbl:"#1a1206",r:4.9},
- {n:"Bleu de Chanel EDT",b:"Chanel",cat:"best",g:"Masculino",seas:"Primavera",occ:"Día",dur:"4–6 hrs",notes:"Toronja, Menta, Jengibre, Incienso y Pachulí",p5:230,p10:460,c1:"#101824",c2:"#06090e",cap:"#0a0d12",lbl:"#aebfd4",r:4.8},
- {n:"Light Blue Eau Intense",b:"Dolce & Gabbana",cat:"best",g:"Masculino",seas:"Primavera",occ:"Día",dur:"8–10 hrs",notes:"Toronja, Mandarina, Agua de Mar y Amberwood",p5:230,p10:460,c1:"#2a78b8",c2:"#0f3a5e",cap:"#cfe2f0",lbl:"#eaf4fb",r:4.6},
- {n:"The One Parfum",b:"Dolce & Gabbana",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"5–7 hrs",notes:"Toronja, Cardamomo, Ámbar y Tabaco",p5:340,p10:676,c1:"#7a4410",c2:"#3a2006",cap:"#cfcfcf",lbl:"#f0d9b0",r:4.7},
- {n:"MYSLF EDP",b:"Yves Saint Laurent",cat:"best",g:"Masculino",seas:"Primavera",occ:"Día",dur:"8–10 hrs",notes:"Bergamota, Ambrofix y Pachulí",p5:310,p10:620,c1:"#16140f",c2:"#080706",cap:"#0a0807",lbl:"#d8d2c4",r:4.7},
- {n:"Stronger With You Absolutely",b:"Emporio Armani",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Ron, Bergamota, Lavanda, Vainilla, Castaña y Pachulí",p5:275,p10:545,c1:"#7a2810",c2:"#3a1206",cap:"#1a0c06",lbl:"#f0b89a",r:4.8},
- {n:"Khamrah",b:"Lattafa",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Canela, Bergamota, Dátiles, Vainilla, Haba Tonka y Amberwood",p5:135,p10:270,c1:"#8a5418",c2:"#43280a",cap:"#caa05a",lbl:"#f3dcae",r:4.9},
- {n:"Red Tobacco",b:"Mancera",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Canela, Madera de Oud, Azafrán, Pachulí, Tabaco y Ámbar",p5:190,p10:370,c1:"#8a1410",c2:"#400806",cap:"#0a0807",lbl:"#f0a89a",r:4.8},
- {n:"Man in Black EDP",b:"Bvlgari",cat:"best",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+10 hrs",notes:"Ron, Tabaco, Cuero, Iris y Haba Tonka",p5:290,p10:580,c1:"#141210",c2:"#070605",cap:"#1c1814",lbl:"#cbb89a",r:4.7},
- {n:"9 PM",b:"Afnan",cat:"best",g:"Unisex",seas:"Invierno",occ:"Noche",dur:"+10 hrs",notes:"Manzana, Bergamota, Flor de Azahar, Vainilla y Haba Tonka",p5:120,p10:240,c1:"#141414",c2:"#060606",cap:"#cfcfcf",lbl:"#e6e6e6",r:4.8},
- {n:"9 AM Dive",b:"Afnan",cat:"best",g:"Unisex",seas:"Primavera",occ:"Día",dur:"+10 hrs",notes:"Limón, Grosella Negra, Cedro, Incienso, Sándalo y Pachulí",p5:120,p10:230,c1:"#1e4c86",c2:"#0c1f3a",cap:"#cfcfcf",lbl:"#bcd4ee",r:4.6},
- {n:"Hawas For Him",b:"Rasasi",cat:"best",g:"Masculino",seas:"Primavera",occ:"Día",dur:"+10 hrs",notes:"Manzana, Bergamota, Cardamomo, Ámbar y Pachulí",p5:125,p10:250,c1:"#6c74a8",c2:"#2e3458",cap:"#cfcfcf",lbl:"#d6dcf0",r:4.7},
- // CLÁSICOS
- {n:"Luna Rossa Black",b:"Prada",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8–10 hrs",notes:"Bergamota, Pachulí, Ámbar y Almizcle",p5:220,p10:440,c1:"#141414",c2:"#060606",cap:"#9a9a9a",lbl:"#cfcfcf",r:4.6},
- {n:"Eros EDT",b:"Versace",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Día",dur:"6 hrs",notes:"Manzana Verde, Haba Tonka, Ambroxan, Vainilla y Musgo",p5:180,p10:360,c1:"#0f6a64",c2:"#063a36",cap:"#caa05a",lbl:"#9fe0da",r:4.7},
- {n:"Spicebomb",b:"Viktor & Rolf",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+10 hrs",notes:"Pimienta Rosa, Bergamota, Canela, Azafrán, Cuero y Tabaco",p5:220,p10:430,c1:"#1a1814",c2:"#0a0806",cap:"#3a3632",lbl:"#d4c8b0",r:4.6},
- {n:"Gentleman Society",b:"Givenchy",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8 hrs",notes:"Cardamomo, Vetiver, Narciso Francés, Palo Santo y Vainilla",p5:200,p10:400,c1:"#16140f",c2:"#080706",cap:"#cfcfcf",lbl:"#d8d2c4",r:4.7},
- {n:"Wanted by Night",b:"Azzaro",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8 hrs",notes:"Canela, Comino, Cedro, Tabaco, Cuero y Pachulí",p5:280,p10:570,c1:"#7a5210",c2:"#3a2606",cap:"#3a3632",lbl:"#f0d4a0",r:4.7},
- {n:"Boss Infinite",b:"Hugo Boss",cat:"clasico",g:"Masculino",seas:"Primavera",occ:"Día",dur:"8 hrs",notes:"Manzana, Salvia, Lavanda, Romero y Pachulí",p5:200,p10:400,c1:"#1e3a78",c2:"#0c1838",cap:"#1c2c52",lbl:"#bcd0f0",r:4.5},
- {n:"Bottled Parfum",b:"Hugo Boss",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+8 hrs",notes:"Incienso, Lirio, Cuero y Cedro",p5:250,p10:520,c1:"#241c16",c2:"#0e0a07",cap:"#2a2420",lbl:"#d4c4ac",r:4.6},
- {n:"Bottled Absolu",b:"Hugo Boss",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+10 hrs",notes:"Incienso, Cuero, Pachulí, Cedro y Davana",p5:250,p10:520,c1:"#2a2018",c2:"#100b07",cap:"#caa05a",lbl:"#e0caa6",r:4.7},
- {n:"Bottled Elixir",b:"Hugo Boss",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Incienso, Cardamomo, Pachulí, Vetiver y Cedro",p5:270,p10:540,c1:"#6a4a14",c2:"#33240a",cap:"#caa05a",lbl:"#f0d8a8",r:4.8},
- {n:"The Scent Elixir",b:"Hugo Boss",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Chile Rojo, Lavanda y Sándalo",p5:270,p10:540,c1:"#7a1812",c2:"#3a0a06",cap:"#caa05a",lbl:"#f0a89a",r:4.7},
- {n:"Sauvage EDP",b:"Dior",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Día",dur:"+8 hrs",notes:"Bergamota, Lavanda, Anís, Ambroxan y Vainilla",p5:230,p10:460,c1:"#16233f",c2:"#080d18",cap:"#0b1422",lbl:"#9fc0ee",r:4.9},
- {n:"Explorer Platinum",b:"Montblanc",cat:"clasico",g:"Masculino",seas:"Primavera",occ:"Día",dur:"6–7 hrs",notes:"Hojas de Violeta, Esclarea y Cedro",p5:180,p10:360,c1:"#9aa0a6",c2:"#54595e",cap:"#cfd2d6",lbl:"#1a1c1e",r:4.5},
- {n:"CH Men Sport EDT",b:"Carolina Herrera",cat:"clasico",g:"Masculino",seas:"Primavera",occ:"Día",dur:"6–7 hrs",notes:"Toronja, Bergamota, Notas Marinas, Vetiver y Sándalo",p5:140,p10:280,c1:"#b53a2e",c2:"#6a1810",cap:"#cfcfcf",lbl:"#f4e8e6",r:4.5},
- {n:"CH Men EDT",b:"Carolina Herrera",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Día",dur:"6–7 hrs",notes:"Bergamota, Azafrán, Cuero, Ámbar y Sándalo",p5:140,p10:280,c1:"#1a1614",c2:"#0a0706",cap:"#caa05a",lbl:"#d4c4ac",r:4.6},
- {n:"212 VIP Black Smiley",b:"Carolina Herrera",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Día",dur:"7–8 hrs",notes:"Naranja, Jengibre, Pimienta, Lavanda y Vainilla",p5:230,p10:430,c1:"#141414",c2:"#060606",cap:"#1c1c1c",lbl:"#f4d23a",r:4.6},
- {n:"Nuit d'Issey",b:"Issey Miyake",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"6–7 hrs",notes:"Toronja, Bergamota, Cuero, Ébano y Haba Tonka",p5:140,p10:280,c1:"#14182a",c2:"#070912",cap:"#0a0c14",lbl:"#aeb6cc",r:4.6},
- {n:"Fusion d'Issey Extrême",b:"Issey Miyake",cat:"clasico",g:"Masculino",seas:"Primavera",occ:"Día",dur:"6–7 hrs",notes:"Cardamomo, Bergamota, Lavanda, Sándalo y Pachulí",p5:160,p10:320,c1:"#1e6cc4",c2:"#0c2e5e",cap:"#cfcfcf",lbl:"#bcd8f4",r:4.6},
- {n:"One Million Parfum",b:"Paco Rabanne",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Día",dur:"+12 hrs",notes:"Nardo, Cuero, Ámbar y Azafrán",p5:150,p10:300,c1:"#c79a2e",c2:"#7a5a14",cap:"#e7c777",lbl:"#3a2a08",r:4.7},
- {n:"Aoud Exclusif",b:"Mancera",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"+12 hrs",notes:"Azafrán, Comino, Pimienta, Pachulí y Madera de Oud",p5:270,p10:540,c1:"#7a3a10",c2:"#3a1c06",cap:"#caa05a",lbl:"#f0c89a",r:4.7},
- {n:"Club de Nuit Milestone",b:"Armaf",cat:"clasico",g:"Unisex",seas:"Primavera",occ:"Noche",dur:"+8 hrs",notes:"Frutos Rojos, Bergamota, Sándalo, Almizcle y Ambroxan",p5:100,p10:195,c1:"#e0b89a",c2:"#a07a5a",cap:"#caa05a",lbl:"#4a3420",r:4.6}
-];
+/* ====== DATA: el catálogo se carga desde fragancias.js ====== */
 
 /* ============ STATE ============ */
 let cart = {};      // key -> {idx,size,qty}
@@ -807,6 +783,65 @@ function getFilters(){
   const occ=[...document.querySelectorAll('.f-occ:checked')].map(c=>c.value);
   return {gens,seas,occ};
 }
+function buyable(p){return p.stock!==false && p.p10>0;}
+function waConsulta(p){
+  const t=`Hola Soy de Aroma, quisiera saber el precio y disponibilidad de ${p.n} (${p.b}).`;
+  return "https://wa.me/"+WA+"?text="+encodeURIComponent(t);
+}
+function imgTag(p){return `<img class="photo" src="${p.img}" alt="${p.b} ${p.n}" loading="lazy">`;}
+function visual(p){return (p.img&&p.img.length)?imgTag(p):bottle(p);}
+function cardHTML(p){
+  const sel=(cart[p.idx+"-10"]?10:cart[p.idx+"-5"]?5:10);
+  const out=p.stock===false, pending=!out&&p.p10<=0, ok=!out&&!pending;
+  const stTag = out?'<span class="tag out">Agotado</span>' : (pending?'<span class="tag pend">Precio por confirmar</span>':'');
+  let foot;
+  if(ok){
+    foot=`<div class="sizepick" id="sp-${p.idx}">
+          <button class="sizebtn ${sel===5?'sel':''}" onclick="pick(${p.idx},5)"><span class="sz">5 ml</span><span class="pr">${fmt(p.p5)}</span></button>
+          <button class="sizebtn ${sel===10?'sel':''}" onclick="pick(${p.idx},10)"><span class="sz">10 ml</span><span class="pr">${fmt(p.p10)}</span></button>
+        </div>
+        <button class="addbtn" onclick="addCart(${p.idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Agregar</button>`;
+  } else if(pending){
+    foot=`<a class="addbtn consult" href="${waConsulta(p)}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15.5a6 6 0 01-6 6 12 12 0 01-12-12 6 6 0 016-6c.5 0 1 .3 1.2.8l1.3 3a1.3 1.3 0 01-.3 1.4l-1.2 1.2a9 9 0 004.1 4.1l1.2-1.2a1.3 1.3 0 011.4-.3l3 1.3c.5.2.8.7.8 1.2z"/></svg>Consultar precio</a>`;
+  } else {
+    foot=`<button class="addbtn disabled" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>Agotado</button>`;
+  }
+  return `<article class="card${ok?'':' soldout'}">
+      <div class="imgwrap" onclick="openModal(${p.idx})">
+        <div class="tags">
+          ${p.cat==="best"?'<span class="tag best">★ Top Ventas</span>':''}
+          ${p.g==="Unisex"?'<span class="tag uni">Unisex</span>':''}
+          ${stTag}
+        </div>
+        <button class="fav ${favs[p.idx]?'on':''}" onclick="event.stopPropagation();toggleFav(${p.idx})" aria-label="Favorito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3 1 4 2.5C11 6 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.5-5.5 9-5.5 9z"/></svg>
+        </button>
+        ${visual(p)}
+      </div>
+      <div class="info">
+        <div class="brandline">${p.b}</div>
+        <div class="pname" onclick="openModal(${p.idx})">${p.n}</div>
+        <div class="rating">${stars(p.r)}<span class="rn">${p.r.toFixed(1)}</span></div>
+        <div class="notes"><b>Notas:</b> ${p.notes}</div>
+        <div class="meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>${p.seas}</span>
+          <span class="durbadge ${durClass(p.dur)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${p.dur}</span>
+        </div>
+        <div class="cardfoot">${foot}</div>
+      </div>
+    </article>`;
+}
+function modalCTA(p,idx,sel){
+  if(p.stock===false)
+    return `<button class="addbtn disabled" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>Agotado por el momento</button>`;
+  if(p.p10<=0)
+    return `<a class="addbtn consult" href="${waConsulta(p)}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15.5a6 6 0 01-6 6 12 12 0 01-12-12 6 6 0 016-6c.5 0 1 .3 1.2.8l1.3 3a1.3 1.3 0 01-.3 1.4l-1.2 1.2a9 9 0 004.1 4.1l1.2-1.2a1.3 1.3 0 011.4-.3l3 1.3c.5.2.8.7.8 1.2z"/></svg>Consultar precio por WhatsApp</a>`;
+  return `<div class="sizepick" id="msp-${idx}">
+        <button class="sizebtn ${sel===5?'sel':''}" onclick="mpick(${idx},5)"><span class="sz">5 ml</span><span class="pr">${fmt(p.p5)}</span></button>
+        <button class="sizebtn ${sel===10?'sel':''}" onclick="mpick(${idx},10)"><span class="sz">10 ml</span><span class="pr">${fmt(p.p10)}</span></button>
+      </div>
+      <button class="addbtn" onclick="addCart(${idx});closeAll();openCart()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>Agregar al carrito</button>`;
+}
 function render(){
   const q=$("search").value.trim().toLowerCase();
   $("catSel").value=cat;
@@ -836,38 +871,7 @@ function render(){
     grid.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><p>No encontramos fragancias con esos filtros.</p></div>`;
     return;
   }
-  grid.innerHTML=list.map(p=>{
-    const sel = (cart[p.idx+"-10"]?10:cart[p.idx+"-5"]?5:10);
-    return `<article class="card">
-      <div class="imgwrap" onclick="openModal(${p.idx})">
-        <div class="tags">
-          ${p.cat==="best"?'<span class="tag best">★ Top Ventas</span>':''}
-          ${p.g==="Unisex"?'<span class="tag uni">Unisex</span>':''}
-        </div>
-        <button class="fav ${favs[p.idx]?'on':''}" onclick="event.stopPropagation();toggleFav(${p.idx})" aria-label="Favorito">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5 6 5c2 0 3 1 4 2.5C11 6 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.5-5.5 9-5.5 9z"/></svg>
-        </button>
-        ${bottle(p)}
-      </div>
-      <div class="info">
-        <div class="brandline">${p.b}</div>
-        <div class="pname" onclick="openModal(${p.idx})">${p.n}</div>
-        <div class="rating">${stars(p.r)}<span class="rn">${p.r.toFixed(1)}</span></div>
-        <div class="notes"><b>Notas:</b> ${p.notes}</div>
-        <div class="meta">
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>${p.seas}</span>
-          <span class="durbadge ${durClass(p.dur)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${p.dur}</span>
-        </div>
-        <div class="sizepick" id="sp-${p.idx}">
-          <button class="sizebtn ${sel===5?'sel':''}" onclick="pick(${p.idx},5)"><span class="sz">5 ml</span><span class="pr">${fmt(p.p5)}</span></button>
-          <button class="sizebtn ${sel===10?'sel':''}" onclick="pick(${p.idx},10)"><span class="sz">10 ml</span><span class="pr">${fmt(p.p10)}</span></button>
-        </div>
-        <button class="addbtn" onclick="addCart(${p.idx})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Agregar
-        </button>
-      </div>
-    </article>`;
-  }).join("");
+  grid.innerHTML=list.map(cardHTML).join("");
 }
 
 let picks={}; // idx -> size
@@ -899,22 +903,7 @@ function quickFilter(f){
 function renderList(list,title){
   $("rtitle").textContent=title;$("rcount").textContent=`· ${list.length} fragancias`;
   const grid=$("grid");
-  grid.innerHTML=list.map(p=>{
-    const sel=10;
-    return `<article class="card"><div class="imgwrap" onclick="openModal(${p.idx})">
-      <div class="tags">${p.cat==="best"?'<span class="tag best">★ Top Ventas</span>':''}</div>
-      ${bottle(p)}</div><div class="info"><div class="brandline">${p.b}</div>
-      <div class="pname" onclick="openModal(${p.idx})">${p.n}</div>
-      <div class="rating">${stars(p.r)}<span class="rn">${p.r.toFixed(1)}</span></div>
-      <div class="notes"><b>Notas:</b> ${p.notes}</div>
-      <div class="meta"><span>${p.seas}</span><span class="durbadge ${durClass(p.dur)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${p.dur}</span></div>
-      <div class="sizepick" id="sp-${p.idx}">
-        <button class="sizebtn" onclick="pick(${p.idx},5)"><span class="sz">5 ml</span><span class="pr">${fmt(p.p5)}</span></button>
-        <button class="sizebtn sel" onclick="pick(${p.idx},10)"><span class="sz">10 ml</span><span class="pr">${fmt(p.p10)}</span></button>
-      </div>
-      <button class="addbtn" onclick="addCart(${p.idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Agregar</button>
-      </div></article>`;
-  }).join("");
+  grid.innerHTML=list.map(cardHTML).join("");
   window.scrollTo({top:document.querySelector('.shell').offsetTop-110,behavior:'smooth'});
 }
 function clearFilters(silent){
@@ -926,6 +915,8 @@ function toggleFav(idx){favs[idx]=!favs[idx];render();}
 
 /* ============ CART ============ */
 function addCart(idx){
+  const p=P[idx];
+  if(p.stock===false||p.p10<=0){toast("Esta fragancia no está disponible por ahora");return;}
   const size = picks[idx] || 10;
   const key = idx+"-"+size;
   if(cart[key]) cart[key].qty++;
@@ -1106,7 +1097,7 @@ function openModal(idx){
   $("modalCard").innerHTML=`
     <div class="modal-img">
       <button class="mclose" onclick="closeAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      ${bottle(p)}
+      ${visual(p)}
     </div>
     <div class="modal-body">
       <div class="mbrand">${p.b}${p.cat==="best"?' · ★ Top Ventas':''}</div>
@@ -1123,11 +1114,7 @@ function openModal(idx){
         <div class="k" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:5px">Pirámide olfativa</div>
         <div class="v" style="font-size:14px;color:var(--text)">${p.notes}</div>
       </div>
-      <div class="sizepick" id="msp-${idx}">
-        <button class="sizebtn ${sel===5?'sel':''}" onclick="mpick(${idx},5)"><span class="sz">5 ml</span><span class="pr">${fmt(p.p5)}</span></button>
-        <button class="sizebtn ${sel===10?'sel':''}" onclick="mpick(${idx},10)"><span class="sz">10 ml</span><span class="pr">${fmt(p.p10)}</span></button>
-      </div>
-      <button class="addbtn" onclick="addCart(${idx});closeAll();openCart()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>Agregar al carrito</button>
+      ${modalCTA(p,idx,sel)}
     </div>`;
   $("modal").classList.add("on");$("overlay").classList.add("on");document.body.style.overflow="hidden";
 }
