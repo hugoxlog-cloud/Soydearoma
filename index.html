@@ -585,9 +585,38 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
   .qopt{padding:12px 13px;gap:11px}
   .qopt .qtxt{font-size:13.5px}
 }
+
+/* ---------- SPLASH / CARGA ---------- */
+.splash{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .45s,visibility .45s}
+.splash.hide{opacity:0;visibility:hidden}
+.splash-logo{width:118px;height:118px;background:var(--logo) center/contain no-repeat;animation:splashPulse 1.5s ease-in-out infinite}
+@keyframes splashPulse{0%,100%{transform:scale(1);opacity:.82}50%{transform:scale(1.06);opacity:1}}
+.splash .sname{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;color:var(--gold-bright)}
+.splash-bar{width:150px;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.splash-bar i{display:block;height:100%;width:38%;border-radius:2px;background:linear-gradient(90deg,var(--gold-deep),var(--gold-bright));animation:splashBar 1.05s ease-in-out infinite}
+@keyframes splashBar{0%{transform:translateX(-130%)}100%{transform:translateX(360%)}}
+/* ---------- DESCUENTO ---------- */
+.sumrow.disc{color:#7fce97}
+.disc-hint{font-size:11.5px;color:var(--gold-bright);margin:8px 0 0;line-height:1.4;text-align:center}
+/* ---------- RECOMENDACIONES DEL QUIZ ---------- */
+.qresult h2{font-size:31px;line-height:1.06}
+.qrecs{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.qrec{display:flex;align-items:center;gap:12px;text-align:left;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;transition:.18s}
+.qrec:hover{border-color:var(--gold-deep);transform:translateY(-2px)}
+.qrec-img{width:52px;height:64px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(120% 120% at 50% 0%,#211c18,#0c0a09)}
+.qrec-img img{width:100%;height:100%;object-fit:contain;padding:4px}
+.qrec-img .mini{width:28px;height:52px;border-radius:4px}
+.qrec-info{min-width:0;text-align:left}
+.qrec-b{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.qrec-n{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;line-height:1.05}
+.qrec-p{font-size:12px;color:var(--gold-bright);margin-top:2px}
+.qresult .rk2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:20px 0 10px;text-align:center}
+.qintro{text-align:center}
+.qintro .istart{margin-top:8px}
 </style>
 </head>
 <body>
+<div class="splash" id="splash"><div class="splash-logo"></div><div class="sname">Soy de Aroma</div><div class="splash-bar"><i></i></div></div>
 <div class="grain"></div>
 <div class="wrap">
 
@@ -667,18 +696,18 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filtros</h3>
       <div class="fgroup">
         <div class="ft">Género</div>
-        <label class="chk"><input type="checkbox" class="f-gen" value="Masculino" onchange="render()">Masculino</label>
-        <label class="chk"><input type="checkbox" class="f-gen" value="Unisex" onchange="render()">Unisex</label>
+        <label class="chk"><input type="checkbox" class="f-gen" value="Masculino" onchange="pickOne(this);render()">Masculino</label>
+        <label class="chk"><input type="checkbox" class="f-gen" value="Unisex" onchange="pickOne(this);render()">Unisex</label>
       </div>
       <div class="fgroup">
         <div class="ft">Temporada</div>
-        <label class="chk"><input type="checkbox" class="f-seas" value="Invierno" onchange="render()">Invierno / Otoño</label>
-        <label class="chk"><input type="checkbox" class="f-seas" value="Primavera" onchange="render()">Primavera / Verano</label>
+        <label class="chk"><input type="checkbox" class="f-seas" value="Invierno" onchange="pickOne(this);render()">Invierno / Otoño</label>
+        <label class="chk"><input type="checkbox" class="f-seas" value="Primavera" onchange="pickOne(this);render()">Primavera / Verano</label>
       </div>
       <div class="fgroup">
         <div class="ft">Ocasión</div>
-        <label class="chk"><input type="checkbox" class="f-occ" value="Noche" onchange="render()">Noche</label>
-        <label class="chk"><input type="checkbox" class="f-occ" value="Día" onchange="render()">Día</label>
+        <label class="chk"><input type="checkbox" class="f-occ" value="Noche" onchange="pickOne(this);render()">Noche</label>
+        <label class="chk"><input type="checkbox" class="f-occ" value="Día" onchange="pickOne(this);render()">Día</label>
       </div>
       <div class="fgroup">
         <div class="ft">Precio (10 ml)</div>
@@ -769,7 +798,10 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
   <div class="ditems" id="ditems"></div>
   <div class="dfoot">
     <div class="sumrow"><span>Productos</span><span id="sumItems">0</span></div>
+    <div class="sumrow"><span>Subtotal</span><span id="sumSub">$0</span></div>
+    <div class="sumrow disc" id="discRow" style="display:none"><span>Descuento 10% (3+ decants)</span><span id="sumDisc">-$0</span></div>
     <div class="sumrow total"><span>Total</span><span class="v" id="sumTotal">$0</span></div>
+    <p class="disc-hint" id="discHint"></p>
     <p class="wa-note">Al continuar verás los <b>datos para tu transferencia</b> y registrarás tu <b>dirección de envío</b>. Después envías tu comprobante por WhatsApp.</p>
     <button class="checkout" id="checkoutBtn" onclick="openCheckout()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M4 10h16M5 21V10M19 21V10M12 3L3 7h18z"/></svg>
@@ -848,10 +880,10 @@ const $ = id => document.getElementById(id);
 /* ====== CONFIG — EDITA ESTOS DATOS CON TU CUENTA REAL ====== */
 const WA = "528180120847"; // WhatsApp con código de país, sin "+"
 const BANK = {
-  banco:   "BANAMEX",
-  clabe:   "002580702130699754",
-  tarjeta: "",
-  titular: "HUGO LOZANO"
+  banco:   "[Tu banco]",
+  clabe:   "[Tu CLABE de 18 dígitos]",
+  tarjeta: "[Tu número de tarjeta]",
+  titular: "[Titular de la cuenta]"
 };
 
 /* ====== DURACIÓN: color por horas ====== */
@@ -987,7 +1019,12 @@ function pick(idx,size){
   document.querySelectorAll(`#sp-${idx} .sizebtn`).forEach((b,i)=>b.classList.toggle('sel',(i===0&&size===5)||(i===1&&size===10)));
 }
 
+function pickOne(el){
+  ['f-gen','f-seas','f-occ'].forEach(cls=>{ if(el.classList.contains(cls)){ document.querySelectorAll('.'+cls).forEach(o=>{ if(o!==el) o.checked=false; }); } });
+}
+function flashSplash(ms){const s=$("splash");if(!s)return;s.classList.remove("hide");clearTimeout(s._t);s._t=setTimeout(()=>s.classList.add("hide"),ms||480);}
 function setCat(c){
+  flashSplash();
   cat=c;
   document.querySelectorAll('.subnav button[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===c));
   render();
@@ -1033,10 +1070,20 @@ function addCart(idx){
 }
 function updateCart(){
   const keys=Object.keys(cart);
-  let items=0,total=0;
-  keys.forEach(k=>{const c=cart[k];const price=c.size===5?P[c.idx].p5:P[c.idx].p10;items+=c.qty;total+=price*c.qty;});
+  let items=0,subtotal=0;
+  keys.forEach(k=>{const c=cart[k];const price=c.size===5?P[c.idx].p5:P[c.idx].p10;items+=c.qty;subtotal+=price*c.qty;});
+  const discount = items>=3 ? Math.round(subtotal*0.10) : 0;
+  const total = subtotal - discount;
   const cc=$("cartCount");cc.textContent=items;cc.classList.toggle('on',items>0);
-  $("sumItems").textContent=items;$("sumTotal").textContent=fmt(total);
+  $("sumItems").textContent=items;
+  $("sumSub").textContent=fmt(subtotal);
+  $("sumTotal").textContent=fmt(total);
+  $("discRow").style.display = discount>0 ? "flex" : "none";
+  $("sumDisc").textContent = "-"+fmt(discount);
+  const hint=$("discHint");
+  if(items>0 && items<3) hint.textContent = `Agrega ${3-items} decant${(3-items)===1?'':'s'} más y obtén 10% de descuento.`;
+  else if(discount>0) hint.textContent = `¡Descuento aplicado! Ahorras ${fmt(discount)} por llevar 3 o más.`;
+  else hint.textContent = "";
   $("checkoutBtn").disabled=items===0;
 
   const di=$("ditems");
@@ -1067,11 +1114,10 @@ function updateCart(){
 function chQty(k,d){cart[k].qty+=d;if(cart[k].qty<=0)delete cart[k];updateCart();}
 function removeItem(k){delete cart[k];updateCart();}
 
-function cartTotal(){
-  let total=0;
-  Object.keys(cart).forEach(k=>{const c=cart[k],p=P[c.idx];total+=(c.size===5?p.p5:p.p10)*c.qty;});
-  return total;
-}
+function cartItems(){let n=0;Object.keys(cart).forEach(k=>n+=cart[k].qty);return n;}
+function cartSubtotal(){let t=0;Object.keys(cart).forEach(k=>{const c=cart[k],p=P[c.idx];t+=(c.size===5?p.p5:p.p10)*c.qty;});return t;}
+function cartDiscount(){return cartItems()>=3?Math.round(cartSubtotal()*0.10):0;}
+function cartTotal(){return cartSubtotal()-cartDiscount();}
 function openCheckout(){
   if(!Object.keys(cart).length)return;
   $("bk-banco").textContent=BANK.banco;
@@ -1091,10 +1137,12 @@ function submitOrder(){
   const v=id=>$(id).value.trim();
   const keys=Object.keys(cart);if(!keys.length)return;
   let msg="¡Hola Soy de Aroma! 👋 Quiero hacer este pedido de decants:\n\n";
-  let total=0;
-  keys.forEach(k=>{const c=cart[k],p=P[c.idx];const price=c.size===5?p.p5:p.p10;total+=price*c.qty;
+  let subtotal=0;
+  keys.forEach(k=>{const c=cart[k],p=P[c.idx];const price=c.size===5?p.p5:p.p10;subtotal+=price*c.qty;
     msg+=`• ${p.n} (${p.b}) — ${c.size} ml x${c.qty} = ${fmt(price*c.qty)}\n`;});
-  msg+=`\n*Total: ${fmt(total)}*\n\n`;
+  const disc=cartDiscount();
+  if(disc>0){ msg+=`\nSubtotal: ${fmt(subtotal)}\nDescuento 10% (3+ decants): -${fmt(disc)}`; }
+  msg+=`\n*Total: ${fmt(subtotal-disc)}*\n\n`;
   msg+="*Datos de envío:*\n";
   msg+=`Nombre: ${v("f-nombre")}\n`;
   msg+=`Tel: ${v("f-tel")}\n`;
@@ -1105,56 +1153,112 @@ function submitOrder(){
   window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(msg),"_blank");
 }
 
-/* ====== CONOCE TU AROMA ====== */
+/* ====== CONOCE TU AROMA · EL EXPERTO DE AROMAS ====== */
 const QUIZ=[
-  {q:"Elige tu paisaje ideal para perderte un fin de semana:",
-   o:[["A","Un bosque de pinos, cabañas de madera y tierra húmeda."],
-      ["B","Un jardín repleto de flores frescas, rosas y lavanda."],
-      ["C","Un campo de cítricos soleado con olor a pasto recién cortado."],
-      ["D","Una playa tropical con brisa marina y coco."]]},
-  {q:"¿A qué huele tu momento favorito del día?",
-   o:[["A","A un café cargado, un libro viejo o un té negro."],
-      ["B","A galletas recién horneadas y un toque sutil de vainilla."],
-      ["C","A sábanas limpias, jabón neutro y ropa recién lavada."],
-      ["D","A una cena elegante con velas, canela, chocolate o especias."]]},
-  {q:"¿Qué vibra quieres transmitir hoy al mundo?",
-   o:[["A","Elegancia, misterio, seguridad y madurez."],
-      ["B","Romance, amabilidad, alegría y delicadeza."],
-      ["C","Frescura, energía, limpieza y vitalidad."],
-      ["D","Sensualidad, presencia fuerte, calidez y audacia."]]},
-  {q:"Tu clima perfecto para salir de casa es...",
-   o:[["A","Otoñal: nublado, fresco y con hojas secas en el suelo."],
-      ["B","Primaveral: templado, soleado y lleno de colores."],
-      ["C","Veraniego: caluroso, brillante, ideal para ropa ligera."],
-      ["D","Invernal: frío intenso, bufandas y noches largas."]]}
+ {q:"¿Dónde preferirías estar?",
+  o:[["A","En una biblioteca antigua, en un sillón de piel con luz tenue y una bebida."],
+     ["B","Caminando descalzo sobre césped húmedo, respirando aire puro de montaña o playa."],
+     ["C","En un café exclusivo o terraza de noche, entre postres recién horneados y buena conversación."],
+     ["D","En un jardín japonés de flores blancas, vistiendo lino ligero bajo un sol suave."]]},
+ {q:"¿Qué estilo elegirías para diseñar tu cocina?",
+  o:[["A","Industrial neoyorquino: acero negro, ladrillo visto, madera rústica y cuero desgastado."],
+     ["B","Mediterráneo español: paredes encaladas, azulejos artesanales, terracota y madera de olivo."],
+     ["C","Clásico parisino: mármol oscuro, gabinetes lacados, bronce dorado y parqué noble."],
+     ["D","Nórdico escandinavo: maderas finas, cuarzo blanco, lino natural y plantas verdes."]]},
+ {q:"Elige tu outfit:",
+  o:[["A","Traje: sastrería impecable, cortes estructurados y zapatos pulidos."],
+     ["B","Libre / extremo: prendas funcionales y cómodas, listas para la aventura."],
+     ["C","Casual: jeans perfectos, playera básica de calidad y tenis limpios."],
+     ["D","Old money: piezas clásicas, atemporales y minimalistas en tonos neutros."]]},
+ {q:"¿Qué música prefieres?",
+  o:[["A","Jazz oscuro, blues melancólico o rock clásico profundo."],
+     ["B","Indie folk acústico, sonidos de la naturaleza o electrónica ambiental."],
+     ["C","Pop sensual, R&B moderno, ritmos latinos lentos o Lo-Fi envolvente."],
+     ["D","Clásica de piano, neoclásica minimalista o baladas acústicas suaves."]]},
+ {q:"Elige la pintura que más te cautive:",
+  o:[["A","La noche estrellada (Van Gogh): cielos nocturnos y remolinos azules místicos."],
+     ["B","El nacimiento de Venus (Botticelli): una diosa emergiendo de la espuma marina."],
+     ["C","El beso (Klimt): una pareja envuelta en oro, calidez y pasión."],
+     ["D","La Gioconda (Da Vinci): sofisticación minimalista y calma atemporal."]]},
+ {q:"¿Cuál de estos platillos elegirías?",
+  o:[["A","Un corte premium madurado a la leña, con vino tinto profundo."],
+     ["B","Un bowl de mariscos frescos con cítricos, hierbas y agua mineral helada."],
+     ["C","Un volcán de chocolate con helado de vainilla, frutos rojos y canela."],
+     ["D","Pasta artesanal con crema de trufa blanca, parmesano sutil y albahaca."]]}
 ];
 const RESULTS={
-  A:{emoji:"🪵",title:"Alma de Bosque",fam:"Familia Amaderada",
-     desc:"Te atraen los aromas elegantes, maduros y con carácter. Buscas la estabilidad de la naturaleza.",
-     notes:"Cedro, sándalo, vetiver, pachulí.",
-     ex:"Bleu de Chanel, Terre d'Hermès, Santal 33.",
-     search:"sándalo"},
-  B:{emoji:"🌹",title:"Espíritu Romántico",fam:"Familia Floral",
-     desc:"Disfrutas de los aromas clásicos, suaves, alegres y reconfortantes. Te envuelve la delicadeza.",
-     notes:"Jazmín, rosa, peonía, lavanda.",
-     ex:"Miss Dior, J'adore, Acqua di Parma Colonia.",
-     search:"lavanda"},
-  C:{emoji:"🍋",title:"Inyección de Energía",fam:"Familia Cítrica / Fresca",
-     desc:"Amas la sensación de limpieza, dinamismo y frescura. Tu perfume ideal es ligero y vital.",
-     notes:"Bergamota, limón, mandarina, té verde.",
-     ex:"CK One, Light Blue de Dolce & Gabbana, Acqua di Giò.",
-     search:"bergamota"},
-  D:{emoji:"🌶️",title:"Presencia Magnética",fam:"Familia Oriental / Gourmand",
-     desc:"Te encantan las fragancias intensas, cálidas, dulces y sensuales. No te gusta pasar desapercibido.",
-     notes:"Vainilla, ámbar, haba tonka, especias.",
-     ex:"Black Opium, Spicebomb, Tobacco Vanille, Good Girl.",
-     search:"vainilla"}
+ A:{emoji:"🖤",title:"El Alma Enigmática y Magnética",
+    notes:"Notas oscuras, maderas nobles, cuero, tabaco dulce y especias exóticas.",
+    sug:"Personalidad imponente, madura y sofisticada. Tienes un gusto impecable por lo clásico y lo de carácter fuerte. No buscas complacer: marcas territorio con elegancia y misterio.",
+    uso:"Tu mejor arma para noches frías, citas formales o eventos especiales. Úsala cuando quieras ser el centro de atención de forma misteriosa y proyectar máxima autoridad.",
+    keys:["cuero","tabaco","oud","azafrán","pachulí","ámbar"]},
+ B:{emoji:"🌿",title:"El Espíritu Libre y Natural",
+    notes:"Musgo de roble, vetiver, pachulí, cítricos vibrantes y brisa marina.",
+    sug:"Conectas con la naturaleza y la autenticidad. Alma libre, transparente y empática, que busca la frescura de la vida cotidiana sin pretensiones.",
+    uso:"El uso diario por excelencia: mañanas soleadas, oficina o salidas al aire libre. Una estela de limpieza y vitalidad que te hace sentir renovado y accesible.",
+    keys:["vetiver","toronja","bergamota","mar","limón","menta","pachulí"]},
+ C:{emoji:"🔥",title:"El Seductor Cálido e Irresistible",
+    notes:"Notas gourmand (vainilla, caramelo, haba tonka), ámbar y frutas maduras con especias.",
+    sug:"Eres pasional, expresivo y magnético. Te atraen la noche, la buena conversación y los placeres indulgentes. Un lado dulce que atrapa y una calidez que invita a quedarse cerca.",
+    uso:"Para citas románticas, salidas nocturnas y climas templados o invernales. Un aroma que invita a la cercanía; úsalo para dejar una impresión deliciosamente adictiva.",
+    keys:["vainilla","haba tonka","ámbar","dátiles","miel","canela","manzana"]},
+ D:{emoji:"🤍",title:"La Elegancia Sutil y Serena",
+    notes:"Flores blancas (jazmín, neroli), almizcle blanco, notas atalcadas y lavanda.",
+    sug:"Tu belleza está en la simplicidad y el lujo silencioso. Transmites paz, pulcritud y una ternura discreta. Valoras la sofisticación que no necesita gritar para notarse.",
+    uso:"Ideal para el día a día, relax en casa o reuniones sutiles. Perfecto cuando quieres oler 'a ti, pero mejor', con una vibra de calma y limpieza absoluta.",
+    keys:["almizcle","lavanda","iris","flor de azahar","sándalo"]},
+ AB:{emoji:"🧭",title:"El Explorador Sofisticado",
+    notes:"Amaderadas-aromáticas o cuero fresco: cuero combinado con pino, ciprés o bergamota.",
+    sug:"Balance perfecto entre la rudeza de la naturaleza y la elegancia de la madurez. Imponente pero accesible; amas el aire libre pero sabes cuándo vestir un traje impecable.",
+    uso:"Excelente para reuniones al aire libre, eventos de día en otoño o citas casuales. Presencia pulcra y madura, con espíritu libre.",
+    keys:["cuero","bergamota","vetiver","cedro","pachulí"]},
+ AC:{emoji:"🌙",title:"El Aristócrata Nocturno",
+    notes:"Orientales-amaderadas o especiadas densas: maderas oscuras con vainilla, tabaco, ron o ámbar.",
+    sug:"La definición del misterio seductor. Combinas la autoridad de la madera con la adicción de lo dulce: personalidad fuerte que sabe envolver con calidez en la intimidad.",
+    uso:"Noches de gala, citas a media luz e invierno profundo. Un aroma denso y ultra seductor; úsalo para sentirte costoso, nocturno e irresistible.",
+    keys:["tabaco","vainilla","ron","ámbar","oud","cuero"]},
+ AD:{emoji:"🪵",title:"El Lujo Silencioso · Old Money",
+    notes:"Maderas limpias, sándalo cremoso, iris, gamuza suave y almizcle.",
+    sug:"Gusto clásico e intelectual de nivel superior. Unes la fuerza de los materiales nobles con la sutileza del minimalismo. No llamas la atención de forma ruidosa: que te descubran de cerca.",
+    uso:"Oficina ejecutiva, firmas importantes y cenas sofisticadas de día. Limpio pero con un fondo costoso y amaderado de estatus discreto.",
+    keys:["sándalo","iris","almizcle","cedro"]},
+ BC:{emoji:"🍹",title:"El Seductor Relajado · Casual Chic",
+    notes:"Cítricos dulces, acuáticas-gourmand o frutales frescas (mandarina con haba tonka, menta con vainilla).",
+    sug:"Vibra magnética, joven, alegre y carismática. Eres el alma de la fiesta sin esforzarte: unes la frescura del espíritu libre con la dulzura del coqueteo casual.",
+    uso:"Fiestas en la playa de noche, salidas casuales, fines de semana o citas de tarde. Un aura divertida, sexy y muy fácil de gustar.",
+    keys:["mandarina","haba tonka","menta","vainilla","manzana","toronja","bergamota"]},
+ BD:{emoji:"🧘",title:"La Pureza Zen · Frescura Minimalista",
+    notes:"Verdes-florales, té verde, neroli, lavanda fresca y maderas claras.",
+    sug:"Un remanso de paz andante. Transparencia, orden y bienestar; buscas que todo se sienta limpio, natural y en armonía.",
+    uso:"Después del baño, ejercicio, meditar o domingos de descanso. Sensación prolongada de pulcritud y frescura zen.",
+    keys:["lavanda","bergamota","salvia","romero","cedro","toronja"]},
+ CD:{emoji:"🫶",title:"La Calidez Acogedora",
+    notes:"Notas atalcadas-dulces, heliotropo, almendras cremosas, almizcle y vainilla sutil.",
+    sug:"Eres tierno, cercano y protector. Unes la pulcritud de lo limpio con el abrazo de lo dulce: la sensación de estar en casa, con un toque refinado y sensual.",
+    uso:"Tardes lluviosas, citas en casa, momentos familiares o antes de dormir. Invita al contacto suave y genera confianza absoluta.",
+    keys:["vainilla","almizcle","haba tonka","iris"]},
+ CAM:{emoji:"🦎",title:"El Camaleón Olfativo · Versátil",
+    notes:"Fougère modernas o azules: cítricos, lavanda, maderas y un toque de ámbar.",
+    sug:"No te encasillas. Eres adaptable y equilibrado: disfrutas una noche elegante igual que una aventura o una tarde relajada. Tu aroma es tan versátil como tu agenda.",
+    uso:"Tu fragancia todoterreno: día, noche, oficina o cita. Se adapta a tu entorno y asegura que huelas bien en cualquier escenario.",
+    keys:["lavanda","bergamota","cedro","ámbar","toronja","ambroxan"]}
 };
-let quizStep=0, quizAns=[];
-function openQuiz(){quizStep=0;quizAns=[];renderQuiz();$("quiz").classList.add("on");$("overlay").classList.add("on");document.body.style.overflow="hidden";}
+let quizStep=0, quizAns=[], lastRecs=[];
+function openQuiz(){quizAns=[];quizStep=0;flashSplash(420);renderIntro();$("quiz").classList.add("on");$("overlay").classList.add("on");document.body.style.overflow="hidden";}
 function closeQuiz(){$("quiz").classList.remove("on");$("overlay").classList.remove("on");document.body.style.overflow="";}
+function renderIntro(){
+  $("quizCard").innerHTML=`
+    <button class="qclose" onclick="closeQuiz()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="qintro">
+      <div class="qeyebrow">El Experto de Aromas</div>
+      <h2>Descubre tu Identidad Olfativa</h2>
+      <p class="rdesc">El perfume no se elige solo por cómo huele, sino por cómo te hace sentir y lo que proyecta de ti. Tómate un minuto: no pienses en ingredientes, piensa en tus momentos, tus gustos y tu forma de ver el mundo.</p>
+      <button class="addbtn istart" onclick="startQuiz()">Comenzar test</button>
+    </div>`;
+}
+function startQuiz(){quizStep=0;quizAns=[];renderQuiz();}
 function answer(letter){quizAns[quizStep]=letter;quizStep++;if(quizStep<QUIZ.length)renderQuiz();else renderResult();}
-function quizBack(){if(quizStep>0){quizStep--;renderQuiz();}}
+function quizBack(){if(quizStep>0){quizStep--;renderQuiz();}else renderIntro();}
 function renderQuiz(){
   const item=QUIZ[quizStep];
   const prog=QUIZ.map((_,i)=>`<i class="${i<=quizStep?'done':''}"></i>`).join("");
@@ -1166,36 +1270,57 @@ function renderQuiz(){
     <div class="qopts">
       ${item.o.map(([l,t])=>`<button class="qopt" onclick="answer('${l}')"><span class="qletter">${l}</span><span class="qtxt">${t}</span></button>`).join("")}
     </div>
-    ${quizStep>0?`<button class="clearbtn" style="margin-top:18px" onclick="quizBack()">← Anterior</button>`:""}`;
+    <button class="clearbtn" style="margin-top:18px" onclick="quizBack()">← Anterior</button>`;
 }
+function quizResultKey(){
+  const c={A:0,B:0,C:0,D:0};
+  quizAns.forEach(l=>c[l]++);
+  const max=Math.max(c.A,c.B,c.C,c.D);
+  const top=["A","B","C","D"].filter(l=>c[l]===max);
+  if(top.length===1) return top[0];
+  if(top.length===2) return top.join("");
+  return "CAM";
+}
+function quizRecs(keys,n){
+  if(typeof P==="undefined"||!Array.isArray(P)) return [];
+  const kk=keys.map(k=>k.toLowerCase());
+  const scored=P.map((p,idx)=>({p,idx,score:kk.reduce((a,k)=>a+(p.notes.toLowerCase().includes(k)?1:0),0)}))
+    .filter(x=>x.score>0 && x.p.stock!==false && x.p.p10>0);
+  scored.sort((a,b)=> b.score-a.score || b.p.r-a.p.r);
+  return scored.slice(0,n||3);
+}
+function quizOpen(idx){closeQuiz();openModal(idx);}
 function renderResult(){
-  const count={A:0,B:0,C:0,D:0};
-  quizAns.forEach(l=>count[l]++);
-  let best="A",bestN=-1;
-  ["A","B","C","D"].forEach(l=>{if(count[l]>bestN){bestN=count[l];best=l;}});
-  const r=RESULTS[best];
+  const r=RESULTS[quizResultKey()];
+  const recs=quizRecs(r.keys,3);
+  lastRecs=recs.map(x=>x.idx);
+  const recsHtml = recs.length ? recs.map(({p,idx})=>`
+      <button class="qrec" onclick="quizOpen(${idx})">
+        <div class="qrec-img">${(p.img&&p.img.length)?`<img src="${p.img}" alt="${p.b} ${p.n}">`:miniBottle(p)}</div>
+        <div class="qrec-info"><div class="qrec-b">${p.b}</div><div class="qrec-n">${p.n}</div><div class="qrec-p">${fmt(p.p10)} · 10 ml</div></div>
+      </button>`).join("")
+    : `<p class="rdesc" style="font-size:13px">Escríbenos por WhatsApp y te recomendamos la mejor opción para tu perfil.</p>`;
   $("quizCard").innerHTML=`
     <button class="qclose" onclick="closeQuiz()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="qresult">
       <div class="remoji">${r.emoji}</div>
-      <div class="rfam">${r.fam}</div>
       <h2>${r.title}</h2>
-      <p class="rdesc">${r.desc}</p>
-      <div class="rblock"><div class="rk">Notas clave para ti</div><div class="rv">${r.notes}</div></div>
-      <div class="rblock"><div class="rk">Referencias icónicas</div><div class="rv">${r.ex}</div></div>
+      <div class="rblock"><div class="rk">Tu perfil olfativo</div><div class="rv">${r.notes}</div></div>
+      <div class="rblock"><div class="rk">Mi sugerencia</div><div class="rv">${r.sug}</div></div>
+      <div class="rblock"><div class="rk">Recomendación de uso</div><div class="rv">${r.uso}</div></div>
+      <div class="rk2">Tu firma olfativa en nuestro catálogo</div>
+      <div class="qrecs">${recsHtml}</div>
       <div class="racts">
-        <button class="rmain" onclick="quizToCatalog('${r.search}')">Ver fragancias afines</button>
+        ${recs.length?`<button class="rmain" onclick="quizShowRecs()">Ver todas en el catálogo</button>`:`<a class="rmain" href="https://wa.me/${WA}?text=${encodeURIComponent('Hola Soy de Aroma, hice el test del Experto de Aromas y mi perfil es: '+r.title)}" target="_blank" style="text-decoration:none;display:grid;place-items:center">Consultar por WhatsApp</a>`}
         <button class="rsec" onclick="openQuiz()">Repetir test</button>
       </div>
     </div>`;
 }
-function quizToCatalog(term){
+function quizShowRecs(){
   closeQuiz();
-  cat="all";document.querySelectorAll('.subnav button[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==="all"));
-  clearFilters(true);
-  $("search").value=term;
-  render();
-  window.scrollTo({top:document.querySelector('.shell').offsetTop-110,behavior:'smooth'});
+  if(!lastRecs.length)return;
+  const list=lastRecs.map(i=>({...P[i],idx:i}));
+  renderList(list,"Tu firma olfativa");
 }
 
 /* ============ MODAL ============ */
@@ -1234,7 +1359,18 @@ let toastTimer;
 function toast(m){$("toastMsg").textContent=m;const t=$("toast");t.classList.add("on");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("on"),2200);}
 document.addEventListener('keydown',e=>{if(e.key==="Escape")closeAll();});
 
-render();updateCart();
+function initApp(){
+  const splash=$("splash");
+  if(typeof P==="undefined" || !Array.isArray(P)){
+    const g=$("grid");
+    if(g) g.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><p>No se pudo cargar el catálogo (falta el archivo <b>fragancias.js</b>).<br>Sube todos los archivos juntos para verlo.</p></div>';
+    if(splash) splash.classList.add("hide");
+    return;
+  }
+  render();updateCart();
+  setTimeout(()=>{ if(splash) splash.classList.add("hide"); }, 650);
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initApp); else initApp();
 </script>
 <script async src="https://www.tiktok.com/embed.js"></script>
 </body>
