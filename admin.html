@@ -101,8 +101,9 @@ input,select,textarea{font-family:inherit}
   <div class="gate-card">
     <div class="logo"></div>
     <h1>Panel de administrador</h1>
-    <p>Ingresa la contraseña para gestionar tu catálogo de fragancias.</p>
-    <input id="pass" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')tryLogin()">
+    <p>Inicia sesión para gestionar tu catálogo de fragancias.</p>
+    <input id="email" type="email" placeholder="Correo" autocomplete="username" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')tryLogin()">
+    <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')tryLogin()">
     <button onclick="tryLogin()">Entrar</button>
     <div class="err" id="gateErr"></div>
   </div>
@@ -116,11 +117,9 @@ input,select,textarea{font-family:inherit}
     <button class="btn ghost" onclick="addItem()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Agregar fragancia
     </button>
-    <button class="btn ghost" onclick="copyData()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>Copiar
-    </button>
-    <button class="btn green" onclick="downloadData()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar fragancias.js
+    <span class="count" id="saveState" style="margin-right:4px"></span>
+    <button class="btn ghost" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 17l5-5-5-5M21 12H9M12 21H5a2 2 0 01-2-2V5a2 2 0 012-2h7"/></svg>Cerrar sesión
     </button>
   </div>
 </header>
@@ -129,11 +128,11 @@ input,select,textarea{font-family:inherit}
   <div class="howto">
     <b>¿Cómo se usa?</b>
     <ol>
-      <li>Edita aquí lo que necesites: precios, notas, marca el <b>Agotado / En existencia</b>, agrega o elimina fragancias.</li>
-      <li>Pulsa <b>Descargar fragancias.js</b>.</li>
-      <li>Sube ese archivo <b>fragancias.js</b> a tu hosting (Netlify / Cloudflare), reemplazando el anterior. ¡Listo, los cambios se ven en tu sitio!</li>
+      <li>Edita lo que necesites: precios, notas, marca el <b>Agotado / En existencia</b>, agrega o elimina fragancias.</li>
+      <li><b>Los cambios se guardan solos</b> en la base de datos (Supabase) y aparecen en tu sitio al instante. No hay que subir ningún archivo.</li>
+      <li>Arriba a la derecha verás <b>“Guardando…”</b> y luego <b>“Guardado”</b> cada vez que editas.</li>
     </ol>
-    Nota: este panel no se publica con el sitio si no quieres; puedes guardarlo solo en tu computadora. La contraseña es una protección ligera, no uses datos sensibles aquí.
+    Nota: solo tú (con tu correo y contraseña) puedes entrar y modificar el catálogo. El público solo puede verlo.
   </div>
 
   <div class="toolbar">
@@ -147,29 +146,100 @@ input,select,textarea{font-family:inherit}
 <div class="toast" id="toast"></div>
 
 <!-- carga el catálogo actual -->
-<script src="fragancias.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const ADMIN_PASS = "sda26hxlg$"; // ⚠️ Cámbiala por la tuya
+/* ====== Conexión a Supabase ====== */
+const SB_URL="https://loepgdgrnsqgencxbpbh.supabase.co";
+const SB_KEY="sb_publishable_LYLJ62qXahfCH-M42IYdig_uIuVhFC8";
+const sb=supabase.createClient(SB_URL,SB_KEY);
 
-let DATA = (typeof P!=="undefined") ? JSON.parse(JSON.stringify(P)) : [];
-DATA.forEach(p=>{ if(p.stock===undefined) p.stock=true; });
-
+let DATA=[];
 const CATS=[["best","Más vendidos"],["clasico","Clásicos"]];
 const GENS=["Masculino","Unisex"];
 const SEAS=["Invierno","Primavera"];
 const OCC=["Noche","Día"];
 const $=id=>document.getElementById(id);
 
-function tryLogin(){
-  if($("pass").value===ADMIN_PASS){ $("gate").classList.add("hide"); renderList(); }
-  else { $("gateErr").textContent="Contraseña incorrecta."; }
+/* ====== AUTENTICACIÓN ====== */
+async function tryLogin(){
+  const email=($("email").value||"").trim();
+  const pass=$("pass").value;
+  $("gateErr").textContent="";
+  if(!email||!pass){ $("gateErr").textContent="Escribe tu correo y contraseña."; return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){ $("gateErr").textContent="Correo o contraseña incorrectos."; return; }
+  enterApp();
+}
+async function logout(){ await sb.auth.signOut(); location.reload(); }
+async function enterApp(){ $("gate").classList.add("hide"); await loadData(); }
+async function loadData(){
+  const r = await sb.from("fragancias").select("*").order("sort_order",{ascending:true});
+  if(r.error){ toast("Error al cargar: "+r.error.message); return; }
+  DATA = r.data || [];
+  renderList();
 }
 
+/* ====== GUARDADO AUTOMÁTICO ====== */
+let saveTimer, pending={};
+function setSaveState(t){ $("saveState").textContent=t; }
+function upd(i,k,v){
+  DATA[i][k]=v;
+  const id=DATA[i].id;
+  if(!pending[id]) pending[id]={};
+  pending[id][k]=v;
+  setSaveState("Guardando…");
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(flushSaves,700);
+}
+async function flushSaves(){
+  const ids=Object.keys(pending);
+  if(!ids.length){ setSaveState(""); return; }
+  const batch=pending; pending={};
+  let ok=true;
+  for(const id of ids){
+    const r=await sb.from("fragancias").update(batch[id]).eq("id",id);
+    if(r.error){ ok=false; console.error(r.error); }
+  }
+  setSaveState(ok?"Guardado ✓":"Error al guardar");
+  if(ok) setTimeout(()=>{ if($("saveState").textContent==="Guardado ✓") setSaveState(""); },1500);
+}
+
+/* ====== ACCIONES ====== */
+async function toggleStock(i){
+  const p=DATA[i]; p.stock=(p.stock===false); renderList();
+  setSaveState("Guardando…");
+  const r=await sb.from("fragancias").update({stock:p.stock}).eq("id",p.id);
+  setSaveState(r.error?"Error al guardar":"Guardado ✓");
+  if(!r.error) setTimeout(()=>{ if($("saveState").textContent==="Guardado ✓") setSaveState(""); },1500);
+}
+async function delItem(i){
+  const p=DATA[i];
+  if(!confirm(`¿Eliminar "${p.b} ${p.n}" del catálogo?`)) return;
+  const r=await sb.from("fragancias").delete().eq("id",p.id);
+  if(r.error){ toast("Error al eliminar: "+r.error.message); return; }
+  DATA.splice(i,1); renderList(); toast("Fragancia eliminada.");
+}
+async function addItem(){
+  const minOrd = DATA.length ? Math.min(...DATA.map(p=>p.sort_order??0)) : 0;
+  const nueva={sort_order:minOrd-1,n:"Nueva fragancia",b:"Marca",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8 hrs",notes:"Nota 1, Nota 2",img:"",p5:0,p10:0,stock:false,c1:"#1a1614",c2:"#0a0706",cap:"#caa05a",lbl:"#d4c4ac",r:4.6};
+  const r=await sb.from("fragancias").insert(nueva).select().single();
+  if(r.error){ toast("Error al agregar: "+r.error.message); return; }
+  $("filter").value="";
+  await loadData();
+  window.scrollTo({top:0,behavior:"smooth"});
+  toast("Fragancia agregada arriba. Edítala y define su precio.");
+}
+
+/* ====== RENDER ====== */
 function opt(list,val){
   return list.map(o=>{const v=Array.isArray(o)?o[0]:o, t=Array.isArray(o)?o[1]:o;
     return `<option value="${v}" ${v===val?'selected':''}>${t}</option>`;}).join("");
 }
-
+function esc(v){return String(v??"").replace(/"/g,"&quot;");}
+function previewImg(i,val){
+  const box=document.getElementById("prev-"+i); if(!box)return;
+  box.innerHTML = val && val.trim() ? `<img src="${val.replace(/"/g,'&quot;')}" alt="">` : '<span>Sin foto · se usa el frasco dibujado</span>';
+}
 function renderList(){
   const f=($("filter").value||"").toLowerCase();
   const list=$("list");
@@ -215,65 +285,15 @@ function renderList(){
   }).join("");
   $("count").textContent=`${shown} de ${DATA.length} fragancias`;
 }
-function esc(v){return String(v??"").replace(/"/g,"&quot;");}
-function upd(i,k,v){ DATA[i][k]=v; if(k==="b"||k==="n"){/* update title on next render */} }
-function toggleStock(i){ DATA[i].stock = (DATA[i].stock===false); renderList(); }
-function previewImg(i,val){
-  const box=document.getElementById("prev-"+i); if(!box)return;
-  box.innerHTML = val && val.trim() ? `<img src="${val.replace(/"/g,'&quot;')}" alt="">` : '<span>Sin foto · se usa el frasco dibujado</span>';
-}
-function delItem(i){
-  if(confirm(`¿Eliminar "${DATA[i].b} ${DATA[i].n}" del catálogo?`)){ DATA.splice(i,1); renderList(); }
-}
-function addItem(){
-  DATA.unshift({n:"Nueva fragancia",b:"Marca",cat:"clasico",g:"Masculino",seas:"Invierno",occ:"Noche",dur:"8 hrs",notes:"Nota 1, Nota 2",img:"",p5:0,p10:0,stock:false,c1:"#1a1614",c2:"#0a0706",cap:"#caa05a",lbl:"#d4c4ac",r:4.6});
-  $("filter").value="";
-  renderList();
-  window.scrollTo({top:0,behavior:"smooth"});
-  toast("Fragancia agregada arriba. Edítala y define su precio.");
-}
 
-/* ---- exportar fragancias.js ---- */
-const ORDER=["n","b","cat","g","seas","occ","dur","notes","img","p5","p10","stock","c1","c2","cap","lbl","r"];
-const HEADER=`/* =====================================================================
-   SOY DE AROMA · BASE DE DATOS DE FRAGANCIAS
-   Generado desde el panel de administrador. Sube este archivo a tu
-   hosting (reemplazando el anterior) para publicar los cambios.
-     img         = ruta de la foto, ej "imagenes/archivo.jpg" ("" usa frasco)
-     stock:true  = En existencia  ·  stock:false = Agotado
-     p5 / p10    = precios (número, sin "$"). 0 = "Precio por confirmar".
-   ===================================================================== */
-
-const P = [
-`;
-function serialize(){
-  const lines=DATA.map(p=>{
-    const parts=ORDER.map(k=>{
-      let v = (k==="stock") ? (p.stock===false?false:true) : p[k];
-      if(k==="img" && (v===undefined||v===null)) v="";
-      if(typeof v==="string") return k+":"+JSON.stringify(v);
-      if(v===undefined||v===null||(typeof v==="number"&&isNaN(v))) v=0;
-      return k+":"+v;
-    });
-    return "  {"+parts.join(", ")+"}";
-  });
-  return HEADER + lines.join(",\n") + "\n];\n";
-}
-function downloadData(){
-  const blob=new Blob([serialize()],{type:"text/javascript"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="fragancias.js"; a.click();
-  URL.revokeObjectURL(a.href);
-  toast("Archivo fragancias.js descargado.");
-}
-function copyData(){
-  navigator.clipboard.writeText(serialize()).then(
-    ()=>toast("Contenido copiado al portapapeles."),
-    ()=>toast("No se pudo copiar; usa Descargar.")
-  );
-}
+/* ====== TOAST + INICIO ====== */
 let tt;
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2400);}
+
+(async function init(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session) enterApp();
+})();
 </script>
 </body>
 </html>
