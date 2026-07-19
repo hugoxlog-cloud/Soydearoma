@@ -648,14 +648,14 @@ footer{background:linear-gradient(180deg,#0e0c0b,#080706);border-top:1px solid v
   </div>
   <nav class="subnav">
     <div class="subnav-inner" id="subnav">
-      <button data-cat="all" class="active" onclick="setCat('all')">Todos</button>
+      <button class="quiz-link" onclick="openQuiz()">✨ Conoce tu Aroma</button>
       <button data-cat="best" onclick="setCat('best')">★ Los Más Vendidos</button>
+      <button data-cat="all" class="active" onclick="setCat('all')">Todos</button>
       <button data-cat="clasico" onclick="setCat('clasico')">Clásicos</button>
       <button data-filt="unisex" onclick="quickFilter('unisex')">Unisex</button>
       <button data-filt="noche" onclick="quickFilter('noche')">Para la Noche</button>
       <button data-filt="dia" onclick="quickFilter('dia')">Para el Día</button>
       <button data-filt="long" onclick="quickFilter('long')">+12 hrs de duración</button>
-      <button class="quiz-link" onclick="openQuiz()">✨ Conoce tu Aroma</button>
       <button onclick="document.getElementById('howto').scrollIntoView()">¿Cómo comprar?</button>
     </div>
   </nav>
