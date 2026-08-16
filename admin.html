@@ -196,6 +196,8 @@ input,select,textarea{font-family:inherit}
 .pbadge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid}
 .pbadge.paid{background:rgba(63,125,82,.16);border-color:rgba(63,125,82,.5);color:#7fce97}
 .pbadge.pending{background:rgba(230,200,115,.14);border-color:rgba(230,200,115,.5);color:#e6c873}
+.pbadge.fin{background:rgba(242,202,80,.16);border-color:var(--gold);color:var(--gold-bright)}
+.ped.locked{opacity:.72;border-color:rgba(242,202,80,.28)}
 .pdate{font-size:11.5px;color:var(--text-faint)}
 .psteps{display:flex;gap:6px;margin:12px 0}
 .pstep{flex:1;text-align:center;font-size:10px;line-height:1.25;padding:8px 4px;border-radius:8px;border:1px solid var(--line);color:var(--text-faint);background:var(--panel-2)}
@@ -556,7 +558,8 @@ function calcCost(){
 }
 
 /* ====== PEDIDOS ====== */
-const ETAPAS=["Recepción","Confirmación de pago","Preparando tu pedido","Tu pedido está en camino"];
+const ETAPAS=["Recepción","Confirmación de pago","Preparando tu pedido","Tu pedido está en camino","Entregado / Finalizado"];
+const ETAPAS_SHORT=["Recepción","Pago","Preparando","En camino","Entregado"];
 let PEDIDOS=[];
 async function loadPedidos(){
   const box=$("pedList"); box.innerHTML='<p style="color:var(--text-faint)">Cargando pedidos…</p>';
@@ -571,12 +574,14 @@ function renderPedidos(){
   box.innerHTML=PEDIDOS.map(p=>{
     const s=p.shipping||{}; const et=p.etapa||1; const paid=p.status==='paid';
     const items=(p.items||[]).map(i=>`${i.n} (${i.b}) · ${i.size}ml ×${i.qty}`).join(' · ');
-    const steps=ETAPAS.map((lbl,idx)=>{const n=idx+1;const cls=n<et?'done':(n===et?'cur':'');return `<div class="pstep ${cls}">${n}. ${lbl}</div>`;}).join("");
+    const steps=ETAPAS_SHORT.map((lbl,idx)=>{const n=idx+1;const cls=n<et?'done':(n===et?'cur':'');return `<div class="pstep ${cls}">${n}. ${lbl}</div>`;}).join("");
     let fecha=''; try{ fecha=p.created_at?new Date(p.created_at).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):''; }catch(e){}
-    return `<div class="ped">
+    const done=et>=5;
+    return `<div class="ped${done?' locked':''}">
       <div class="phead">
         <span class="pref">${p.ref||'—'}</span>
         <span class="pbadge ${paid?'paid':'pending'}">${paid?'Pagado':'Pendiente'}</span>
+        ${done?'<span class="pbadge fin">✓ Finalizado</span>':''}
         <span class="ptot">${fmt(p.total)}</span>
       </div>
       <div class="pdate">${fecha}</div>
@@ -585,7 +590,7 @@ function renderPedidos(){
       <div class="pinfo"><b>${s.nombre||'—'}</b> · ${s.tel||''} ${s.email?('· '+s.email):''}<br>${s.calle||''} #${s.num||''}, Col. ${s.col||''}, ${s.ciudad||''}, ${s.mpio||''}, C.P. ${s.cp||''}${s.ref?(' · Ref: '+s.ref):''}</div>
       <div class="pacts">
         <button class="ppdf" onclick="downloadPedidoPDF('${p.ref}')">⬇ Descargar PDF</button>
-        ${et<4?`<button class="padv" onclick="advanceOrder('${p.ref}',${et+1})">Avanzar a: ${et+1}. ${ETAPAS[et]}</button>`:'<span style="color:#7fce97;font-size:13px;font-weight:600;align-self:center">✓ En camino</span>'}
+        ${et<5?`<button class="padv" onclick="advanceOrder('${p.ref}',${et+1})">Avanzar a: ${et+1}. ${ETAPAS[et]}</button>`:'<span style="color:#7fce97;font-size:13px;font-weight:600;align-self:center">✓ Pedido entregado y finalizado</span>'}
       </div>
     </div>`;
   }).join("");
