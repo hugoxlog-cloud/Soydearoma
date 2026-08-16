@@ -729,6 +729,13 @@ header.topbar{background:rgba(10,10,10,.9)}
 .cko-done p{color:var(--text-dim);font-size:14px;line-height:1.6;max-width:340px;margin:0 auto 20px}
 .cko-done .dbtn{padding:13px 26px;border-radius:11px;border:1px solid var(--gold-deep);color:var(--gold-bright)}
 .cko-done .dbtn:hover{background:rgba(242,202,80,.08)}
+/* Paso de pago con Clip */
+.clip-badge{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--gold-deep);border-radius:13px;padding:15px 16px;margin-bottom:14px}
+.clip-badge svg{width:26px;height:26px;color:var(--gold);flex-shrink:0}
+.clip-badge b{display:block;font-size:15px}
+.clip-badge span{font-size:12.5px;color:var(--text-faint)}
+.cliphelp{display:block;text-align:center;margin-top:14px;font-size:12.5px;color:var(--text-dim);text-decoration:underline;text-underline-offset:3px}
+.cliphelp:hover{color:var(--gold-bright)}
 </style>
 </head>
 <body>
@@ -943,8 +950,6 @@ header.topbar{background:rgba(10,10,10,.9)}
       <div class="cstep"><span class="cdot">2</span><span class="clbl">Envío</span></div>
       <div class="cbar"></div>
       <div class="cstep"><span class="cdot">3</span><span class="clbl">Pago</span></div>
-      <div class="cbar"></div>
-      <div class="cstep"><span class="cdot">4</span><span class="clbl">Confirmar</span></div>
     </div>
 
     <!-- PASO 1 · Revisa tu pedido -->
@@ -961,6 +966,8 @@ header.topbar{background:rgba(10,10,10,.9)}
       <input id="f-nombre" type="text" placeholder="Nombre y apellido">
       <label class="flbl">Teléfono (WhatsApp)</label>
       <input id="f-tel" type="tel" placeholder="Ej. 81 1234 5678">
+      <label class="flbl">Correo (para tu confirmación)</label>
+      <input id="f-email" type="email" placeholder="tucorreo@ejemplo.com">
       <label class="flbl">Calle</label>
       <input id="f-calle" type="text" placeholder="Nombre de la calle">
       <div class="frow">
@@ -977,57 +984,34 @@ header.topbar{background:rgba(10,10,10,.9)}
       <input id="f-ref" type="text" placeholder="Color de casa, entre calles, etc.">
     </div>
 
-    <!-- PASO 3 · Método de pago -->
+    <!-- PASO 3 · Pago con Clip -->
     <div class="cko-step" data-s="3" hidden>
-      <h2>¿Cómo quieres pagar?</h2>
-      <div class="payopts">
-        <button class="payopt sel" data-m="transfer" onclick="setPay('transfer')">
-          <svg class="pico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M4 10h16M5 21V10M19 21V10M12 3L3 7h18z"/></svg>
-          <span class="ptxt"><b>Transferencia SPEI</b><span>Copia los datos, transfiere y envía tu comprobante por WhatsApp.</span></span>
-          <span class="prad"></span>
-        </button>
-        <button class="payopt" data-m="card" onclick="setPay('card')">
-          <svg class="pico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          <span class="ptxt"><b>Tarjeta / link de pago</b><span>Te enviamos un link seguro por WhatsApp para pagar con tarjeta.</span></span>
-          <span class="prad"></span>
-        </button>
+      <h2>Pago seguro</h2>
+      <div class="clip-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        <div><b>Tarjeta de crédito o débito</b><span>Pago protegido con Clip</span></div>
       </div>
-
-      <div class="paybox" id="payTransfer">
-        <div class="bankbox">
-          <div class="bk-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M4 10h16M5 21V10M19 21V10M12 3L3 7h18z"/></svg>Datos para tu transferencia</div>
-          <div class="bankrow"><span class="bk-k">Banco</span><span class="bk-v" id="bk-banco">—</span></div>
-          <div class="bankrow"><span class="bk-k">CLABE</span><span class="bk-v"><span id="bk-clabe">—</span><button class="copybtn" onclick="copyVal($('bk-clabe').textContent.replace(/\s/g,''),this)">Copiar</button></span></div>
-          <div class="bankrow"><span class="bk-k">Tarjeta</span><span class="bk-v"><span id="bk-tarjeta">—</span><button class="copybtn" onclick="copyVal($('bk-tarjeta').textContent.replace(/\s/g,''),this)">Copiar</button></span></div>
-          <div class="bankrow"><span class="bk-k">A nombre de</span><span class="bk-v" id="bk-titular">—</span></div>
-          <div class="bankrow tot"><span class="bk-k">Monto</span><span class="bk-v"><span id="bk-monto">$0</span><button class="copybtn" onclick="copyVal($('cko').dataset.total,this)">Copiar</button></span></div>
-        </div>
-        <p class="paynote">Realiza tu transferencia y guarda el comprobante — lo enviarás por WhatsApp en el último paso.</p>
-      </div>
-
-      <div class="paybox" id="payCard" hidden>
-        <div class="bankbox">
-          <div class="bk-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Pago con tarjeta</div>
-          <p class="paynote" style="margin-top:2px">Al confirmar, se abrirá WhatsApp con tu pedido y te enviaremos un <b style="color:var(--gold-bright)">link de pago seguro</b> para completar con tu tarjeta. No compartas datos de tu tarjeta por chat.</p>
-        </div>
-      </div>
+      <p class="paynote">Al continuar te llevamos a la página segura de <b style="color:var(--gold-bright)">Clip</b> para completar tu pago. Cuando termines, coordinamos tu envío por WhatsApp. Nunca compartas los datos de tu tarjeta por chat.</p>
+      <div class="rev-row"><span>Enviar a</span><b id="ckoShipName">—</b></div>
+      <div class="cko-tot"><span>Total a pagar</span><b id="ckoPayTotal">$0</b></div>
+      <button class="ckobtn" id="clipPayBtn" onclick="payWithClip()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+        Pagar con Clip
+      </button>
+      <a class="cliphelp" href="https://wa.me/528180120847?text=Hola%20Soy%20de%20Aroma%2C%20tengo%20una%20duda%20con%20mi%20pago" target="_blank">¿Problemas para pagar? Escríbenos por WhatsApp</a>
     </div>
 
-    <!-- PASO 4 · Confirmar -->
-    <div class="cko-step" data-s="4" hidden>
-      <h2>Confirma y envía</h2>
-      <div id="ckoReview"></div>
-      <button class="ckobtn" onclick="submitOrder()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15.5a6 6 0 01-6 6 12 12 0 01-12-12 6 6 0 016-6c.5 0 1 .3 1.2.8l1.3 3a1.3 1.3 0 01-.3 1.4l-1.2 1.2a9 9 0 004.1 4.1l1.2-1.2a1.3 1.3 0 011.4-.3l3 1.3c.5.2.8.7.8 1.2z"/></svg>Enviar pedido por WhatsApp</button>
-      <p class="paynote" style="text-align:center">Te confirmaremos por WhatsApp antes de enviar. Tus datos solo se usan para coordinar la entrega.</p>
-    </div>
-
-    <!-- ÉXITO -->
+    <!-- ÉXITO (regreso desde Clip) -->
     <div class="cko-step" data-s="done" hidden>
       <div class="cko-done">
         <div class="dico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg></div>
-        <h2>¡Pedido enviado!</h2>
-        <p>Se abrió WhatsApp con el resumen de tu pedido. <b style="color:var(--text)">Envíanos ese mensaje</b> y te confirmamos en minutos. ✨</p>
-        <button class="dbtn" onclick="closeCheckout()">Seguir explorando</button>
+        <h2>¡Pago recibido!</h2>
+        <p>Tu pago con Clip se completó. Solo falta <b style="color:var(--text)">enviarnos tu pedido por WhatsApp</b> para coordinar el envío de tus decants.</p>
+        <a class="ckobtn" id="clipWaBtn" href="#" target="_blank" style="text-decoration:none;display:inline-flex">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15.5a6 6 0 01-6 6 12 12 0 01-12-12 6 6 0 016-6c.5 0 1 .3 1.2.8l1.3 3a1.3 1.3 0 01-.3 1.4l-1.2 1.2a9 9 0 004.1 4.1l1.2-1.2a1.3 1.3 0 011.4-.3l3 1.3c.5.2.8.7.8 1.2z"/></svg>
+          Enviar mi pedido por WhatsApp
+        </a>
+        <button class="dbtn" onclick="closeCheckout()" style="margin-top:12px">Cerrar</button>
       </div>
     </div>
 
@@ -1102,7 +1086,7 @@ function loadCart(){
   }catch(e){ cart={}; }
 }
 /* ====== DATOS DE ENVÍO RECORDADOS ====== */
-const SHIP_FIELDS=["f-nombre","f-tel","f-calle","f-num","f-cp","f-col","f-ciudad","f-mpio","f-ref"];
+const SHIP_FIELDS=["f-nombre","f-tel","f-email","f-calle","f-num","f-cp","f-col","f-ciudad","f-mpio","f-ref"];
 function saveShipping(){try{const o={};SHIP_FIELDS.forEach(id=>o[id]=($(id)?$(id).value:""));localStorage.setItem('sda_ship',JSON.stringify(o));}catch(e){}}
 function loadShipping(){try{const o=JSON.parse(localStorage.getItem('sda_ship')||'{}');SHIP_FIELDS.forEach(id=>{if(o[id]&&$(id)&&!$(id).value)$(id).value=o[id];});}catch(e){}}
 
@@ -1130,12 +1114,8 @@ async function copyVal(text,btn){
 
 /* ====== CONFIG — EDITA ESTOS DATOS CON TU CUENTA REAL ====== */
 const WA = "528180120847"; // WhatsApp con código de país, sin "+"
-const BANK = {
-  banco:   "BANAMEX",
-  clabe:   "002580702130699754",
-  tarjeta: "5204 1661 7301 1091",
-  titular: "HUGO LOZANO"
-};
+// Pago con Clip (la Edge Function guarda las llaves de forma segura en el servidor)
+const CLIP_URL = "https://loepgdgrnsqgencxbpbh.supabase.co/functions/v1/clip-checkout";
 
 /* ====== DURACIÓN: color por horas ====== */
 function durClass(d){
@@ -1384,19 +1364,13 @@ function cartItems(){let n=0;Object.keys(cart).forEach(k=>n+=cart[k].qty);return
 function cartSubtotal(){let t=0;Object.keys(cart).forEach(k=>{const c=cart[k],p=P[c.idx];t+=(c.size===5?p.p5:p.p10)*c.qty;});return t;}
 function cartDiscount(){return cartItems()>=3?Math.round(cartSubtotal()*0.10):0;}
 function cartTotal(){return cartSubtotal()-cartDiscount();}
-/* ====== CHECKOUT GUIADO ====== */
-let ckoStep=1, payMethod='transfer';
+/* ====== CHECKOUT GUIADO (pago con Clip) ====== */
+let ckoStep=1;
 function openCheckout(){
   if(!Object.keys(cart).length)return;
-  $("bk-banco").textContent=BANK.banco;
-  $("bk-clabe").textContent=BANK.clabe;
-  $("bk-tarjeta").textContent=BANK.tarjeta;
-  $("bk-titular").textContent=BANK.titular;
-  $("bk-monto").textContent=fmt(cartTotal());
   $("cko").dataset.total=String(cartTotal());
   loadShipping();
   renderCkoSummary();
-  payMethod='transfer'; setPay('transfer');
   showCkoStep(1);
   $("drawer").classList.remove("on");
   $("cko").classList.add("on");$("overlay").classList.add("on");document.body.style.overflow="hidden";
@@ -1410,24 +1384,17 @@ function showCkoStep(n){
   const nav=$("ckoNav");
   if(n==='done'){ nav.style.display='none'; return; }
   nav.style.display='flex';
-  nav.querySelector('.cko-next').style.display = (Number(n)>=4)?'none':'';
+  nav.querySelector('.cko-next').style.display = (Number(n)>=3)?'none':'';
   nav.querySelector('.cko-back').textContent = Number(n)===1 ? '← Volver al carrito' : '← Atrás';
   const card=document.querySelector('#cko .cko-card'); if(card) card.scrollTop=0;
 }
 function ckoNext(){
   if(ckoStep===1){ showCkoStep(2); }
-  else if(ckoStep===2){ if(!validateShipping())return; saveShipping(); showCkoStep(3); }
-  else if(ckoStep===3){ renderCkoReview(); showCkoStep(4); }
+  else if(ckoStep===2){ if(!validateShipping())return; saveShipping(); prepPayStep(); showCkoStep(3); }
 }
 function ckoBack(){
   if(ckoStep===1){ closeCheckout(); openCart(); }
   else if(typeof ckoStep==='number'){ showCkoStep(ckoStep-1); }
-}
-function setPay(m){
-  payMethod=m;
-  document.querySelectorAll('#cko .payopt').forEach(b=>b.classList.toggle('sel',b.dataset.m===m));
-  $("payTransfer").hidden = m!=='transfer';
-  $("payCard").hidden = m!=='card';
 }
 function renderCkoSummary(){
   const keys=Object.keys(cart);
@@ -1439,6 +1406,10 @@ function renderCkoSummary(){
   $("ckoSummary").innerHTML=html;
   $("ckoGrandTotal").textContent=fmt(cartTotal());
 }
+function prepPayStep(){
+  $("ckoPayTotal").textContent=fmt(cartTotal());
+  $("ckoShipName").textContent=$("f-nombre").value.trim()||"—";
+}
 function validateShipping(){
   const required=["f-nombre","f-tel","f-calle","f-num","f-cp","f-col","f-ciudad","f-mpio"];
   let ok=true,first=null;
@@ -1446,40 +1417,79 @@ function validateShipping(){
   if(!ok){toast("Completa los datos de envío");if(first)first.focus();}
   return ok;
 }
-function renderCkoReview(){
+/* Construye y guarda el pedido pendiente (para armar el WhatsApp al volver de Clip) */
+function buildOrderMsg(ref,paid){
   const v=id=>$(id).value.trim();
-  const method = payMethod==='card' ? 'Tarjeta / link de pago' : 'Transferencia SPEI';
-  $("ckoReview").innerHTML=`
-    <div class="rev-row"><span>Total a pagar</span><b>${fmt(cartTotal())}</b></div>
-    <div class="rev-row"><span>Método de pago</span><b>${method}</b></div>
-    <div class="rev-row"><span>Enviar a</span><b>${v("f-nombre")||'—'}</b></div>
-    <div class="rev-addr">${v("f-calle")} #${v("f-num")}, Col. ${v("f-col")}, ${v("f-ciudad")}, ${v("f-mpio")}, C.P. ${v("f-cp")}${v("f-ref")?' · '+v("f-ref"):''}</div>
-    <div class="rev-tel">Tel: ${v("f-tel")}</div>`;
-}
-function submitOrder(){
-  if(!validateShipping()){ showCkoStep(2); return; }
-  const v=id=>$(id).value.trim();
-  const keys=Object.keys(cart);if(!keys.length)return;
-  saveShipping();
-  let msg="¡Hola Soy de Aroma! 👋 Quiero hacer este pedido de decants:\n\n";
-  let subtotal=0;
-  keys.forEach(k=>{const c=cart[k],p=P[c.idx];const price=c.size===5?p.p5:p.p10;subtotal+=price*c.qty;
-    msg+=`• ${p.n} (${p.b}) — ${c.size} ml x${c.qty} = ${fmt(price*c.qty)}\n`;});
+  const keys=Object.keys(cart);let subtotal=0;
+  let lines=keys.map(k=>{const c=cart[k],p=P[c.idx];const price=c.size===5?p.p5:p.p10;subtotal+=price*c.qty;
+    return `• ${p.n} (${p.b}) — ${c.size} ml x${c.qty} = ${fmt(price*c.qty)}`;}).join("\n");
   const disc=cartDiscount();
-  if(disc>0){ msg+=`\nSubtotal: ${fmt(subtotal)}\nDescuento 10% (3+ decants): -${fmt(disc)}`; }
-  msg+=`\n*Total: ${fmt(subtotal-disc)}*\n\n`;
-  msg+="*Datos de envío:*\n";
+  let msg = paid
+    ? "¡Hola Soy de Aroma! 👋 Acabo de *PAGAR con Clip* ✅ mi pedido:\n\n"
+    : "¡Hola Soy de Aroma! 👋 Quiero este pedido de decants:\n\n";
+  msg+=lines+"\n";
+  if(disc>0) msg+=`\nSubtotal: ${fmt(subtotal)}\nDescuento 10% (3+ decants): -${fmt(disc)}`;
+  msg+=`\n*Total: ${fmt(subtotal-disc)}*`;
+  if(ref) msg+=`\nReferencia: ${ref}`;
+  msg+="\n\n*Datos de envío:*\n";
   msg+=`Nombre: ${v("f-nombre")}\n`;
   msg+=`Tel: ${v("f-tel")}\n`;
   msg+=`Dirección: ${v("f-calle")} #${v("f-num")}, Col. ${v("f-col")}\n`;
   msg+=`Ciudad: ${v("f-ciudad")} · ${v("f-mpio")} · C.P. ${v("f-cp")}\n`;
   if(v("f-ref")) msg+=`Referencias: ${v("f-ref")}\n`;
-  msg+= payMethod==='card'
-    ? "\n*Pago:* Quiero pagar con *tarjeta / link de pago*. ¿Me comparten el link por aquí, por favor? 🙏"
-    : "\n*Pago:* Realizaré mi *transferencia* y enseguida les envío mi comprobante. ¡Gracias!";
-  window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(msg),"_blank");
-  cart={}; updateCart();
-  showCkoStep('done');
+  if(paid) msg+="\nAdjunto mi comprobante de Clip. ¡Gracias! 🙏";
+  return msg;
+}
+async function payWithClip(){
+  if(!validateShipping()){ showCkoStep(2); return; }
+  const total=cartTotal();
+  if(total<=0){ toast("Tu carrito está vacío"); return; }
+  const ref="SDA-"+Date.now();
+  // guarda el mensaje ya armado para usarlo al regresar del pago
+  try{ localStorage.setItem('sda_pending',JSON.stringify({ref,total,msg:buildOrderMsg(ref,true)})); }catch(e){}
+  const btn=$("clipPayBtn"); const orig=btn.innerHTML;
+  btn.disabled=true; btn.innerHTML='Generando link de pago…';
+  const origin=location.origin+location.pathname;
+  const v=id=>($(id)?$(id).value.trim():"");
+  const keys=Object.keys(cart);
+  const orderItems=keys.map(k=>{const c=cart[k],p=P[c.idx];return {n:p.n,b:p.b,size:c.size,qty:c.qty,price:(c.size===5?p.p5:p.p10)};});
+  const order={ items:orderItems, subtotal:cartSubtotal(), discount:cartDiscount(), total,
+    shipping:{nombre:v("f-nombre"),tel:v("f-tel"),email:v("f-email"),calle:v("f-calle"),num:v("f-num"),cp:v("f-cp"),col:v("f-col"),ciudad:v("f-ciudad"),mpio:v("f-mpio"),ref:v("f-ref")} };
+  try{
+    const r=await fetch(CLIP_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+      amount: total,
+      description: "Pedido Soy de Aroma ("+cartItems()+" decants)",
+      external_reference: ref,
+      customer: { name:v("f-nombre"), phone:v("f-tel"), email:v("f-email") },
+      urls: { success: origin+"?clip=success&ref="+encodeURIComponent(ref), error: origin+"?clip=error", default: origin },
+      order
+    })});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok && j && j.url){ location.href=j.url; return; }
+    console.error("Clip error:",j);
+    toast("No se pudo iniciar el pago. Intenta de nuevo o escríbenos por WhatsApp.");
+  }catch(e){ console.error(e); toast("Error de conexión al iniciar el pago."); }
+  btn.disabled=false; btn.innerHTML=orig;
+}
+/* Al volver desde la página de pago de Clip */
+function handleClipReturn(){
+  const params=new URLSearchParams(location.search);
+  const clip=params.get('clip');
+  if(!clip) return;
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  if(clip==='success'){
+    let o={}; try{ o=JSON.parse(localStorage.getItem('sda_pending')||'{}'); }catch(e){}
+    cart={}; try{ localStorage.removeItem('sda_cart'); }catch(e){} updateCart();
+    const wa="https://wa.me/"+WA+"?text="+encodeURIComponent(o.msg || "¡Hola! Acabo de pagar con Clip mi pedido ✅. Referencia: "+(params.get('ref')||o.ref||""));
+    $("clipWaBtn").href=wa;
+    $("cko").classList.add("on");$("overlay").classList.add("on");document.body.style.overflow="hidden";
+    showCkoStep('done');
+    try{ localStorage.removeItem('sda_pending'); }catch(e){}
+    setTimeout(()=>{ try{window.open(wa,"_blank");}catch(e){} },300);
+  } else {
+    toast("El pago no se completó. Puedes intentarlo de nuevo.");
+    setTimeout(()=>openCart(),500);
+  }
 }
 
 /* ====== CONOCE TU AROMA · EL EXPERTO DE AROMAS ====== */
@@ -1698,7 +1708,7 @@ function initApp(){
     return;
   }
   render(); loadCart(); updateCart();
-  setTimeout(()=>{ if(splash) splash.classList.add("hide"); openByFrag(); }, 650);
+  setTimeout(()=>{ if(splash) splash.classList.add("hide"); handleClipReturn(); openByFrag(); }, 650);
 }
 async function loadCatalog(){
   try{
