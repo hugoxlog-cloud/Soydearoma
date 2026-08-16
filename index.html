@@ -665,6 +665,17 @@ header.topbar{background:rgba(10,10,10,.9)}
 .copybtn.copied{background:var(--gold);color:#3c2f00;border-color:var(--gold)}
 .bankrow .bk-v{display:flex;align-items:center;gap:8px;justify-content:flex-end}
 
+/* Cintilla de descuento persistente (siempre visible al comprar) */
+.promobar{display:none;cursor:pointer;text-align:center;padding:9px 16px;font-size:13px;font-weight:600;letter-spacing:.02em;
+  color:#2a2100;background:linear-gradient(90deg,var(--gold-deep),var(--gold-bright),var(--gold-deep));
+  border-top:1px solid rgba(242,202,80,.4)}
+.promobar.on{display:block}
+.promobar.done{background:linear-gradient(90deg,#2a6b42,#3f9d62,#2a6b42);color:#eafff0}
+.cko-dischint{font-size:12.5px;color:var(--gold-bright);background:rgba(242,202,80,.08);border:1px solid var(--gold-deep);
+  border-radius:9px;padding:9px 12px;margin-bottom:14px;text-align:center;display:none}
+.cko-dischint.on{display:block}
+.cko-dischint.done{color:#7fce97;border-color:rgba(63,125,82,.5);background:rgba(63,125,82,.12)}
+
 /* Barra de carrito fija en móvil */
 .mbar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(13,14,15,.97);backdrop-filter:blur(12px);border-top:1px solid var(--gold-deep);display:none}
 .mbar .mprog{height:3px;background:var(--panel-2)}
@@ -782,6 +793,7 @@ header.topbar{background:rgba(10,10,10,.9)}
       <button onclick="document.getElementById('howto').scrollIntoView()">¿Cómo comprar?</button>
     </div>
   </nav>
+  <div class="promobar" id="promoBar" onclick="openCart()"></div>
 </header>
 
 <!-- HERO -->
@@ -945,16 +957,19 @@ header.topbar{background:rgba(10,10,10,.9)}
 
     <!-- Progreso -->
     <div class="cko-prog" id="ckoProg">
-      <div class="cstep"><span class="cdot">1</span><span class="clbl">Pedido</span></div>
+      <div class="cstep"><span class="cdot">1</span><span class="clbl">Confirma</span></div>
       <div class="cbar"></div>
       <div class="cstep"><span class="cdot">2</span><span class="clbl">Envío</span></div>
       <div class="cbar"></div>
       <div class="cstep"><span class="cdot">3</span><span class="clbl">Pago</span></div>
+      <div class="cbar"></div>
+      <div class="cstep"><span class="cdot">4</span><span class="clbl">Confirmación</span></div>
     </div>
 
-    <!-- PASO 1 · Revisa tu pedido -->
+    <!-- PASO 1 · Confirma tu pedido -->
     <div class="cko-step" data-s="1">
-      <h2>Revisa tu pedido</h2>
+      <h2>Confirma tu pedido</h2>
+      <div id="ckoDiscHint" class="cko-dischint"></div>
       <div id="ckoSummary"></div>
       <div class="cko-tot"><span>Total a pagar</span><b id="ckoGrandTotal">$0</b></div>
     </div>
@@ -986,7 +1001,7 @@ header.topbar{background:rgba(10,10,10,.9)}
 
     <!-- PASO 3 · Pago con Clip -->
     <div class="cko-step" data-s="3" hidden>
-      <h2>Pago seguro</h2>
+      <h2>Realiza tu pago</h2>
       <div class="clip-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
         <div><b>Tarjeta de crédito o débito</b><span>Pago protegido con Clip</span></div>
@@ -1006,12 +1021,9 @@ header.topbar{background:rgba(10,10,10,.9)}
       <div class="cko-done">
         <div class="dico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg></div>
         <h2>¡Pago recibido!</h2>
-        <p>Tu pago con Clip se completó. Solo falta <b style="color:var(--text)">enviarnos tu pedido por WhatsApp</b> para coordinar el envío de tus decants.</p>
-        <a class="ckobtn" id="clipWaBtn" href="#" target="_blank" style="text-decoration:none;display:inline-flex">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15.5a6 6 0 01-6 6 12 12 0 01-12-12 6 6 0 016-6c.5 0 1 .3 1.2.8l1.3 3a1.3 1.3 0 01-.3 1.4l-1.2 1.2a9 9 0 004.1 4.1l1.2-1.2a1.3 1.3 0 011.4-.3l3 1.3c.5.2.8.7.8 1.2z"/></svg>
-          Enviar mi pedido por WhatsApp
-        </a>
-        <button class="dbtn" onclick="closeCheckout()" style="margin-top:12px">Cerrar</button>
+        <p>Tu pago se completó correctamente ✅. Te enviamos la <b style="color:var(--text)">confirmación por correo</b> y comenzaremos a preparar tu envío. Recibirás un correo en cada etapa de tu pedido.</p>
+        <button class="ckobtn" onclick="closeCheckout()">Seguir explorando</button>
+        <a class="cliphelp" id="clipWaBtn" href="#" target="_blank">¿Dudas o aclaraciones? Escríbenos por WhatsApp</a>
       </div>
     </div>
 
@@ -1319,6 +1331,15 @@ function updateCart(){
 
   /* persistencia + barra móvil */
   saveCart();
+  /* cintilla de descuento persistente */
+  const pb=$("promoBar");
+  if(pb){
+    if(items>0){
+      pb.classList.add("on");
+      if(items<3){ pb.classList.remove("done"); pb.textContent = `Agrega ${3-items} decant${(3-items)===1?'':'s'} más y obtén 10% de descuento`; }
+      else { pb.classList.add("done"); pb.textContent = `🎉 ¡10% de descuento aplicado! Ahorras ${fmt(discount)}`; }
+    } else { pb.classList.remove("on","done"); }
+  }
   const mb=$("mbar");
   if(mb){
     if(items>0){
@@ -1378,14 +1399,15 @@ function openCheckout(){
 function closeCheckout(){$("cko").classList.remove("on");$("overlay").classList.remove("on");document.body.style.overflow="";}
 function showCkoStep(n){
   ckoStep=n;
+  const num = (n==='done') ? 4 : Number(n);
   document.querySelectorAll('#cko .cko-step').forEach(s=>{ s.hidden = s.dataset.s!==String(n); });
-  document.querySelectorAll('#ckoProg .cstep').forEach((d,i)=>{ const num=i+1; d.classList.toggle('active',num===Number(n)); d.classList.toggle('done',num<Number(n)); });
-  document.querySelectorAll('#ckoProg .cbar').forEach((b,i)=>{ b.classList.toggle('done',(i+1)<Number(n)); });
+  document.querySelectorAll('#ckoProg .cstep').forEach((d,i)=>{ const k=i+1; d.classList.toggle('active',k===num); d.classList.toggle('done',k<num); });
+  document.querySelectorAll('#ckoProg .cbar').forEach((b,i)=>{ b.classList.toggle('done',(i+1)<num); });
   const nav=$("ckoNav");
   if(n==='done'){ nav.style.display='none'; return; }
   nav.style.display='flex';
-  nav.querySelector('.cko-next').style.display = (Number(n)>=3)?'none':'';
-  nav.querySelector('.cko-back').textContent = Number(n)===1 ? '← Volver al carrito' : '← Atrás';
+  nav.querySelector('.cko-next').style.display = (num>=3)?'none':'';
+  nav.querySelector('.cko-back').textContent = num===1 ? '← Volver al carrito' : '← Atrás';
   const card=document.querySelector('#cko .cko-card'); if(card) card.scrollTop=0;
 }
 function ckoNext(){
@@ -1405,6 +1427,11 @@ function renderCkoSummary(){
   if(disc>0) html+=`<div class="cko-sum disc"><span>Descuento 10% (3+ decants)</span><span>-${fmt(disc)}</span></div>`;
   $("ckoSummary").innerHTML=html;
   $("ckoGrandTotal").textContent=fmt(cartTotal());
+  const dh=$("ckoDiscHint"); const it=cartItems();
+  if(dh){ dh.classList.add("on");
+    if(it<3){ dh.classList.remove("done"); dh.textContent=`Agrega ${3-it} decant${(3-it)===1?'':'s'} más y obtén 10% de descuento`; }
+    else { dh.classList.add("done"); dh.textContent=`🎉 ¡10% de descuento aplicado! Ahorras ${fmt(disc)}`; }
+  }
 }
 function prepPayStep(){
   $("ckoPayTotal").textContent=fmt(cartTotal());
@@ -1478,14 +1505,10 @@ function handleClipReturn(){
   if(!clip) return;
   try{ history.replaceState(null,"",location.pathname); }catch(e){}
   if(clip==='success'){
-    let o={}; try{ o=JSON.parse(localStorage.getItem('sda_pending')||'{}'); }catch(e){}
-    cart={}; try{ localStorage.removeItem('sda_cart'); }catch(e){} updateCart();
-    const wa="https://wa.me/"+WA+"?text="+encodeURIComponent(o.msg || "¡Hola! Acabo de pagar con Clip mi pedido ✅. Referencia: "+(params.get('ref')||o.ref||""));
-    $("clipWaBtn").href=wa;
+    cart={}; try{ localStorage.removeItem('sda_cart'); localStorage.removeItem('sda_pending'); }catch(e){} updateCart();
+    $("clipWaBtn").href="https://wa.me/"+WA+"?text="+encodeURIComponent("Hola Soy de Aroma, acabo de pagar mi pedido y tengo una duda:");
     $("cko").classList.add("on");$("overlay").classList.add("on");document.body.style.overflow="hidden";
     showCkoStep('done');
-    try{ localStorage.removeItem('sda_pending'); }catch(e){}
-    setTimeout(()=>{ try{window.open(wa,"_blank");}catch(e){} },300);
   } else {
     toast("El pago no se completó. Puedes intentarlo de nuevo.");
     setTimeout(()=>openCart(),500);
