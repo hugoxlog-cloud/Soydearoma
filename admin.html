@@ -209,6 +209,8 @@ input,select,textarea{font-family:inherit}
 .padv{background:linear-gradient(145deg,var(--gold-bright),var(--gold-deep));color:#3c2f00}
 .padv:hover{filter:brightness(1.06)}
 .padv:disabled{opacity:.35;cursor:not-allowed}
+.ppdf{border:1px solid var(--gold-deep);color:var(--gold-bright);background:transparent}
+.ppdf:hover{background:rgba(242,202,80,.08)}
 .prefresh{border:1px solid var(--line);color:var(--text-dim);margin-bottom:16px;padding:10px 15px;border-radius:9px;font-size:13px;font-weight:600}
 .prefresh:hover{border-color:var(--gold-deep);color:var(--gold)}
 </style>
@@ -320,6 +322,7 @@ input,select,textarea{font-family:inherit}
 <div class="toast" id="toast"></div>
 
 <!-- carga el catálogo actual -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ====== Conexión a Supabase ====== */
@@ -581,10 +584,47 @@ function renderPedidos(){
       <div class="pitems">${items||'—'}</div>
       <div class="pinfo"><b>${s.nombre||'—'}</b> · ${s.tel||''} ${s.email?('· '+s.email):''}<br>${s.calle||''} #${s.num||''}, Col. ${s.col||''}, ${s.ciudad||''}, ${s.mpio||''}, C.P. ${s.cp||''}${s.ref?(' · Ref: '+s.ref):''}</div>
       <div class="pacts">
-        ${et<4?`<button class="padv" onclick="advanceOrder('${p.ref}',${et+1})">Avanzar a: ${et+1}. ${ETAPAS[et]}</button>`:'<span style="color:#7fce97;font-size:13px;font-weight:600">✓ En camino</span>'}
+        <button class="ppdf" onclick="downloadPedidoPDF('${p.ref}')">⬇ Descargar PDF</button>
+        ${et<4?`<button class="padv" onclick="advanceOrder('${p.ref}',${et+1})">Avanzar a: ${et+1}. ${ETAPAS[et]}</button>`:'<span style="color:#7fce97;font-size:13px;font-weight:600;align-self:center">✓ En camino</span>'}
       </div>
     </div>`;
   }).join("");
+}
+function downloadPedidoPDF(ref){
+  const p=PEDIDOS.find(x=>x.ref===ref);
+  if(!p){ toast("Pedido no encontrado"); return; }
+  const JS=(window.jspdf||{}).jsPDF;
+  if(!JS){ toast("No se pudo cargar el generador de PDF"); return; }
+  const doc=new JS({unit:'pt',format:'letter'});
+  const s=p.shipping||{}; const gold=[201,162,75]; const L=48, R=548;
+  let y=54;
+  doc.setFont('times','italic'); doc.setFontSize(24); doc.setTextColor(gold[0],gold[1],gold[2]);
+  doc.text('Soy de Aroma',L,y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120);
+  doc.text('DECANTS PREMIUM · Detalle de pedido',L,y+15);
+  y+=42;
+  doc.setTextColor(30,30,30); doc.setFontSize(11);
+  let fecha=''; try{ fecha=p.created_at?new Date(p.created_at).toLocaleString('es-MX'):''; }catch(e){}
+  doc.text(`Pedido: ${p.ref}`,L,y);
+  doc.text(`Fecha: ${fecha}`,L,y+16);
+  doc.text(`Estatus: ${p.status==='paid'?'PAGADO':'Pendiente'}  ·  Etapa: ${ETAPAS[(p.etapa||1)-1]}`,L,y+32);
+  y+=58;
+  doc.setFontSize(13); doc.setTextColor(gold[0],gold[1],gold[2]); doc.text('Datos de envío',L,y);
+  y+=18; doc.setFontSize(10.5); doc.setTextColor(40,40,40);
+  const addr=`${s.calle||''} #${s.num||''}, Col. ${s.col||''}, ${s.ciudad||''}, ${s.mpio||''}, C.P. ${s.cp||''}`;
+  [`${s.nombre||''}`, `Tel: ${s.tel||''}`, s.email?`Correo: ${s.email}`:'', addr, s.ref?`Referencias: ${s.ref}`:'']
+    .filter(Boolean).forEach(line=>{ doc.text(doc.splitTextToSize(line,R-L),L,y); y+=15; });
+  y+=14;
+  doc.setFontSize(13); doc.setTextColor(gold[0],gold[1],gold[2]); doc.text('Productos',L,y);
+  y+=18; doc.setFontSize(10.5); doc.setTextColor(40,40,40);
+  (p.items||[]).forEach(i=>{
+    doc.text(`• ${i.n} (${i.b}) — ${i.size} ml x${i.qty}`,L,y);
+    doc.text(`$${Number(i.price*i.qty).toLocaleString('es-MX')}`,R,y,{align:'right'}); y+=16;
+  });
+  y+=6; doc.setDrawColor(210,210,210); doc.line(L,y,R,y); y+=22;
+  doc.setFontSize(14); doc.setTextColor(gold[0],gold[1],gold[2]);
+  doc.text('Total',L,y); doc.text(`$${Number(p.total).toLocaleString('es-MX')}`,R,y,{align:'right'});
+  doc.save(`Pedido-${p.ref}.pdf`);
 }
 async function advanceOrder(ref,etapa){
   if(!confirm(`¿Avanzar el pedido ${ref} a "${ETAPAS[etapa-1]}"?\nSe enviará el correo al cliente (si el proveedor está conectado).`)) return;
